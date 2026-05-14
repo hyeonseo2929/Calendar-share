@@ -151,7 +151,7 @@
   const dbRef = ref(db, 'scheduler_data');
 
   // 초기 상태 정의
-  window.state = { adminPw: '1234', members: [], schedules: {} };
+  window.state = { adminPw: 'admin1234', members: [], schedules: {} };
   window.currentUser = null;
   window.viewMode = 'personal';
   window.calYear = new Date().getFullYear();
@@ -165,7 +165,7 @@
     if (!data) {
       console.log("DB 초기화 중...");
       window.state = { 
-        adminPw: '1234', 
+        adminPw: 'admin1234', 
         members: [], 
         schedules: {} 
       };
