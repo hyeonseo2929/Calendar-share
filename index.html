@@ -3,412 +3,437 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Friend Scheduler - HS Calendar</title>
+<title>Friend Scheduler - Admin Edition</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
+  /* [기존 스타일 유지] */
   :root {
-    /* Lavender Purple Theme */
-    --lavender-50:  #f8f7ff; /* 아주 연한 라벤더 화이트 */
-    --lavender-100: #f3f0ff; /* 연한 라벤더 틴트 */
-    --lavender-200: #e5dbff; /* 화사한 연보라 */
-    --lavender-300: #d0bfff; /* 부드러운 라벤더 */
-    --lavender-400: #b197fc; /* 중간 톤 퍼플 */
-    --lavender-500: #9775fa; /* 메인 포인트 퍼플 */
-    --lavender-600: #845ef7; /* 깊은 퍼플 포인트 */
-    
-    --white:    #ffffff;
-    --gray-50:  #f8f9fa;
-    --gray-100: #f1f3f5;
-    --gray-200: #e9ecef;
-    --gray-400: #adb5bd;
-    --gray-600: #868e96;
-    --gray-800: #495057;
-    
-    --shadow: 0 10px 30px rgba(151, 117, 250, 0.12);
+    --pink-50:  #fff0f6; --pink-100: #ffd6e7; --pink-200: #ffadd2; --pink-300: #ff85ba;
+    --pink-400: #f759ab; --pink-500: #eb2f96; --pink-600: #c41d7f; --rose-100: #ffe4e6;
+    --rose-200: #fecdd3; --rose-300: #fda4af; --white:    #ffffff; --gray-50:  #fdf2f8;
+    --gray-100: #f9e8f2; --gray-200: #f3d0e6; --gray-400: #c9879e; --gray-600: #9d5474;
+    --gray-800: #6b2d50; --shadow-sm: 0 2px 8px rgba(235,47,150,.10);
+    --shadow-md: 0 6px 24px rgba(235,47,150,.15); --shadow-lg: 0 16px 48px rgba(235,47,150,.18);
+    --radius: 20px; --radius-sm: 12px;
   }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: linear-gradient(135deg, #fff0f6 0%, #fce7f3 40%, #fdf2f8 100%); min-height: 100vh; color: var(--gray-800); }
+  .header { background: rgba(255,255,255,.85); backdrop-filter: blur(18px); border-bottom: 1.5px solid var(--pink-100); padding: 0 32px; height: 68px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
+  .header-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--pink-500); letter-spacing: -.5px; }
+  .header-user { display: flex; align-items: center; gap: 10px; font-size: .88rem; font-weight: 500; color: var(--gray-600); }
+  .header-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .82rem; color: #fff; box-shadow: 0 2px 8px rgba(235,47,150,.3); flex-shrink: 0; }
+  .screen { display: none; animation: fadeUp .4s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  #loginScreen { min-height: 100vh; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 40px 20px; }
+  #loginScreen.active { display: flex; }
+  .login-card { background: rgba(255,255,255,.92); border: 1.5px solid var(--pink-100); border-radius: 28px; padding: 44px 40px; width: 100%; max-width: 420px; box-shadow: var(--shadow-lg); }
+  .login-title { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--pink-500); text-align: center; }
+  .login-sub { font-size: .88rem; color: var(--gray-400); text-align: center; margin-bottom: 32px; }
+  .member-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+  .member-login-btn { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: var(--radius-sm); border: 1.5px solid var(--pink-100); background: var(--pink-50); cursor: pointer; font-size: .88rem; font-weight: 500; color: var(--gray-800); transition: all .22s; }
+  .member-login-btn:hover { border-color: var(--pink-300); background: var(--white); box-shadow: var(--shadow-sm); transform: translateY(-2px); }
+  .inp { width: 100%; padding: 11px 16px; border-radius: var(--radius-sm); border: 1.5px solid var(--pink-200); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: .88rem; color: var(--gray-800); outline: none; }
+  .btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 11px 22px; border-radius: 99px; border: none; background: linear-gradient(135deg, var(--pink-400), var(--pink-500)); color: #fff; font-weight: 600; cursor: pointer; box-shadow: 0 4px 14px rgba(235,47,150,.35); transition: .2s; }
+  .app-layout { max-width: 1300px; margin: 0 auto; padding: 32px 24px; display: grid; grid-template-columns: 320px 1fr; gap: 24px; align-items: start; }
+  .card { background: rgba(255,255,255,.9); border: 1.5px solid var(--pink-100); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow-sm); }
 
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body {
-    margin: 0; padding: 0;
-    font-family: 'DM Sans', 'Noto Sans KR', sans-serif;
-    /* 배경 그라데이션을 시원한 라벤더 톤으로 수정 */
-    background: linear-gradient(135deg, var(--lavender-50) 0%, var(--white) 100%);
-    color: var(--gray-800);
-    min-height: 100vh;
-  }
+  /* 관리자 패널 전용 스타일 */
+  .admin-member-row { display: grid; grid-template-columns: 30px 1fr 50px 50px; gap: 8px; align-items: center; padding: 12px; border-radius: 12px; background: #fff; border: 1px solid var(--pink-100); margin-bottom: 8px; }
+  .admin-member-row input { border: none; background: var(--pink-50); padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; width: 100%; }
+  .admin-actions { display: flex; gap: 4px; grid-column: span 4; justify-content: flex-end; margin-top: 4px; }
+  .color-circle { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid #fff; box-shadow: 0 0 0 1px #ddd; }
 
-  header {
-    background: var(--white);
-    padding: 30px 20px;
-    text-align: center;
-    box-shadow: var(--shadow);
-    border-bottom: 1px solid var(--lavender-100);
-  }
+  /* 기존 캘린더 스타일 유지 */
+  .cal-grid-wrapper { background: rgba(255,255,255,.92); border: 1.5px solid var(--pink-100); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-md); }
+  .cal-days { display: grid; grid-template-columns: repeat(7, 1fr); }
+  .cal-day { min-height: 90px; padding: 8px; border-right: 1px solid var(--pink-100); border-bottom: 1px solid var(--pink-100); cursor: pointer; position: relative; display: flex; flex-direction: column; gap: 4px; }
+  .cal-day.blocked { background: linear-gradient(135deg, #ffe4e6, #fecdd3) !important; }
+  .day-dot { width: 10px; height: 10px; border-radius: 50%; }
 
-  h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.2rem;
-    margin: 0;
-    color: var(--lavender-600);
-    letter-spacing: -1px;
-  }
-
-  .container { max-width: 800px; margin: 0 auto; padding: 20px; padding-bottom: 120px; }
-
-  /* Card UI */
-  .card {
-    background: var(--white);
-    border-radius: 24px;
-    padding: 24px;
-    margin-bottom: 24px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--lavender-100);
-  }
-
-  /* Buttons */
-  .btn {
-    border: none; border-radius: 12px; padding: 12px 20px;
-    font-weight: 600; cursor: pointer; transition: 0.3s;
-    font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  }
-  .btn-primary { background: var(--lavender-500); color: white; width: 100%; }
-  .btn-primary:hover { background: var(--lavender-600); transform: translateY(-2px); }
-  .btn-outline { background: transparent; border: 1.5px solid var(--lavender-200); color: var(--lavender-600); }
-  .btn-outline:hover { background: var(--lavender-50); }
-
-  /* Calendar Grid */
-  .calendar-header {
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
-  }
-  .calendar-grid {
-    display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;
-  }
-  .day-label { text-align: center; font-weight: 600; font-size: 0.8rem; color: var(--gray-400); padding-bottom: 10px; }
-  .day {
-    aspect-ratio: 1; border-radius: 14px; background: var(--gray-50);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    font-weight: 500; cursor: pointer; position: relative; transition: 0.2s;
-    border: 1px solid transparent; font-size: 0.9rem; overflow: hidden;
-  }
-  .day:hover:not(.empty):not(.disabled) { background: var(--lavender-100); transform: scale(1.05); }
-  .day.today { border-color: var(--lavender-300); color: var(--lavender-600); font-weight: 700; }
-  .day.empty { cursor: default; background: transparent; }
-  .day.disabled { cursor: not-allowed; opacity: 0.3; background: var(--gray-100); color: var(--gray-400); }
-
-  /* Dots for members */
-  .dot-container { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; margin-top: 2px; }
-  .dot { width: 6px; height: 6px; border-radius: 50%; }
-
-  /* Stats & Legend */
-  .status-item {
-    display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--lavender-50);
-  }
-  .color-badge { width: 14px; height: 14px; border-radius: 4px; display: inline-block; margin-right: 6px; }
-
-  /* Toast & Submit Bar */
-  #toast {
-    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-    background: var(--lavender-600); color: white; padding: 12px 24px;
-    border-radius: 30px; font-size: 0.9rem; z-index: 1000;
-    opacity: 0; transition: 0.3s; pointer-events: none;
-  }
-  #toast.show { opacity: 1; bottom: 50px; }
-
-  .submit-bar {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: white; padding: 15px 20px 30px;
-    box-shadow: 0 -10px 30px rgba(151, 117, 250, 0.08);
-    display: flex; flex-direction: column; gap: 10px;
-    border-top: 1px solid var(--lavender-100);
-    z-index: 900; transform: translateY(100%); transition: 0.4s;
-  }
-  .submit-bar.active { transform: translateY(0); }
-
-  /* Admin Section */
-  .admin-only { display: none; }
-  .is-admin .admin-only { display: block; }
-  .is-admin .member-only { display: none; }
-  .admin-input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-  input, select { 
-    padding: 12px; border-radius: 12px; border: 1px solid var(--lavender-200); 
-    font-family: inherit; font-size: 0.95rem; outline: none;
-  }
-  input:focus { border-color: var(--lavender-500); box-shadow: 0 0 0 3px rgba(151, 117, 250, 0.1); }
+  @media (max-width: 900px) { .app-layout { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Friend Scheduler</h1>
-  <p style="color: var(--gray-400); font-size: 0.9rem; margin-top: 5px;">모두가 만날 수 있는 그날까지</p>
+<header class="header">
+  <div class="header-logo">Sched<span>pink</span></div>
+  <div class="header-user" id="headerUser" style="display:none">
+    <div class="header-avatar" id="headerAvatar"></div>
+    <span id="headerName"></span>
+    <button class="btn-logout" style="background:var(--pink-50); border:1.5px solid var(--pink-200); color:var(--pink-500); border-radius:99px; padding:6px 16px; cursor:pointer;" onclick="doLogout()">나가기</button>
+  </div>
 </header>
 
-<div class="container">
-  <div id="view-login" class="card">
-    <h2 style="margin-top:0; font-size: 1.3rem;">멤버 선택</h2>
-    <div id="login-buttons" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"></div>
-  </div>
-
-  <div id="view-app" style="display:none;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <strong id="user-display" style="color: var(--lavender-600);"></strong>
-      <button class="btn btn-outline" onclick="logout()" style="padding:6px 12px; font-size:0.8rem; border-radius:8px;">로그아웃</button>
-    </div>
-
-    <div class="card member-only">
-      <div class="calendar-header">
-        <h3 id="cal-title" style="margin:0; font-size: 1.1rem; color: var(--lavender-600);"></h3>
-        <button class="btn btn-outline" onclick="clearMySchedule()" style="padding:6px 12px; font-size:0.8rem;">초기화</button>
-      </div>
-      <div class="calendar-grid" id="calendar-body"></div>
-      <p style="font-size:0.8rem; color:var(--gray-400); margin-top:15px;">* 불가능한 날짜를 선택하세요.</p>
-    </div>
-
-    <div class="card">
-      <h3 style="margin-top:0; font-size: 1.1rem;">전체 현황</h3>
-      <div id="member-legend" style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:15px; font-size:0.85rem;"></div>
-      <div id="member-status-list"></div>
-    </div>
-
-    <div class="card" style="background: var(--lavender-50); border: none;">
-      <h3 style="margin-top:0; font-size: 1.1rem;">추천 만남일 🥂</h3>
-      <div id="recommend-box"></div>
-    </div>
-
-    <div id="admin-panel" class="card admin-only">
-      <h3 style="margin-top:0; font-size: 1.1rem;">멤버 관리 (Admin)</h3>
-      <div class="admin-input-group">
-        <input type="text" id="new-name" placeholder="친구 이름">
-        <select id="new-color">
-          <option value="#9775fa">기본 라벤더</option>
-          <option value="#845ef7">딥 퍼플</option>
-          <option value="#5c7cfa">로열 블루</option>
-          <option value="#20c997">에메랄드</option>
-          <option value="#fcc419">머스타드</option>
-          <option value="#ff6b6b">소프트 레드</option>
-          <option value="#ffa94d">오렌지</option>
-        </select>
-        <button class="btn btn-primary" onclick="addMember()">친구 추가하기</button>
-      </div>
-      <ul id="admin-member-list" style="list-style:none; padding:0; margin:0;"></ul>
+<div id="loginScreen" class="screen active">
+  <div class="login-card">
+    <div class="login-title">Schedpink</div>
+    <div class="login-sub">모두가 만나는 그날까지</div>
+    <div class="member-grid" id="memberLoginGrid"></div>
+    <hr style="border:0; height:1px; background:linear-gradient(90deg,transparent,var(--pink-200),transparent); margin:20px 0;">
+    <button style="width:100%; padding:13px; border-radius:12px; border:1.5px dashed var(--pink-300); background:transparent; color:var(--pink-500); font-weight:600; cursor:pointer;" onclick="toggleAdminPw()">관리자로 입장</button>
+    <div id="adminPwSection" style="margin-top:14px; display:none; gap:8px;">
+      <input class="inp" id="adminPwInput" type="password" placeholder="관리자 비밀번호" style="flex:1" />
+      <button class="btn-primary" onclick="loginAdmin()">입장</button>
     </div>
   </div>
 </div>
 
-<div id="submit-bar" class="submit-bar">
-  <div id="submit-info" style="font-size:0.9rem; text-align:center; color: var(--gray-600);"></div>
-  <button class="btn btn-primary" onclick="submitSchedule()">일정 전송하기</button>
+<div id="appScreen" class="screen">
+  <div class="app-layout">
+    <aside class="sidebar" style="display:flex; flex-direction:column; gap:18px;">
+      
+      <div class="card" id="memberStatusCard">
+        <div style="font-weight:700; margin-bottom:16px;">👥 멤버 현황</div>
+        <div id="memberStatusList"></div>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:700; margin-bottom:16px;">📊 이번 달 통계</div>
+        <div id="statsContent"></div>
+      </div>
+
+      <div class="card" id="adminCard" style="display:none; border:2px solid var(--pink-300);">
+        <div style="font-weight:700; color:var(--pink-500); margin-bottom:16px;">⚙️ 관리자</div>
+        
+        <div style="margin-bottom:20px;">
+          <p style="font-size:0.75rem; font-weight:700; color:var(--pink-400); margin-bottom:8px;">신규 멤버 등록</p>
+          <div style="display:flex; gap:8px;">
+            <input class="inp" id="newMemberName" placeholder="이름" style="flex:2">
+            <input type="color" id="newMemberColor" value="#eb2f96" style="width:40px; height:40px; border:none; border-radius:8px; cursor:pointer;">
+            <button class="btn-primary" style="padding:0 15px;" onclick="addMember()">추가</button>
+          </div>
+        </div>
+
+        <p style="font-size:0.75rem; font-weight:700; color:var(--pink-400); margin-bottom:8px;">멤버 리스트 수정/삭제</p>
+        <div id="adminDetailedList"></div>
+
+        <hr style="margin:20px 0; border:0; border-top:1px solid var(--pink-100);">
+        <p style="font-size:0.75rem; font-weight:700; color:var(--pink-400); margin-bottom:8px;">비밀번호 변경</p>
+        <div style="display:flex; gap:8px;">
+          <input class="inp" id="newPwInput" type="password" placeholder="새 비밀번호">
+          <button style="white-space:nowrap; padding:0 12px; border-radius:8px; border:1px solid var(--pink-200); background:#fff; cursor:pointer;" onclick="changeAdminPw()">변경</button>
+        </div>
+        <button class="btn-danger" style="width:100%; margin-top:20px; background:#fff0f0; color:#e53e3e; border:none; padding:10px; border-radius:10px; cursor:pointer; font-size:0.8rem;" onclick="resetAll()">⚠️ 모든 일정 데이터 초기화</button>
+      </div>
+    </aside>
+
+    <main class="calendar-area" style="display:flex; flex-direction:column; gap:20px;">
+      <div class="cal-header" style="display:flex; align-items:center; justify-content:space-between;">
+        <button class="cal-nav-btn" style="width:38px; height:38px; border-radius:50%; border:1.5px solid var(--pink-200); background:#fff; cursor:pointer;" onclick="changeMonth(-1)">←</button>
+        <div class="cal-month-label" id="calMonthLabel" style="font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700;"></div>
+        <button class="cal-nav-btn" style="width:38px; height:38px; border-radius:50%; border:1.5px solid var(--pink-200); background:#fff; cursor:pointer;" onclick="changeMonth(1)">→</button>
+        <div class="cal-view-tabs" style="display:flex; gap:6px; background:var(--pink-50); padding:4px; border-radius:99px;">
+          <button class="cal-view-tab active" id="tabPersonal" style="padding:7px 18px; border-radius:99px; border:none; cursor:pointer; font-weight:600;" onclick="switchView('personal')">내 일정</button>
+          <button class="cal-view-tab" id="tabGroup" style="padding:7px 18px; border-radius:99px; border:none; cursor:pointer; font-weight:600;" onclick="switchView('group')">그룹 보기</button>
+        </div>
+      </div>
+
+      <div class="submit-bar" id="submitBar" style="background:#fff; border:1.5px solid var(--pink-200); border-radius:20px; padding:16px 22px; display:flex; justify-content:space-between; align-items:center;">
+        <div id="submitInfo"></div>
+        <button class="btn-primary" onclick="submitSchedule()">일정 전송</button>
+      </div>
+
+      <div class="cal-grid-wrapper">
+        <div style="display:grid; grid-template-columns:repeat(7, 1fr); background:var(--pink-50); text-align:center; padding:12px 0; font-size:0.75rem; font-weight:700; color:var(--gray-600);">
+          <div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div>
+        </div>
+        <div class="cal-days" id="calDays"></div>
+      </div>
+      <div class="card" id="recommendSection" style="display:none;">
+        <div style="font-weight:700; margin-bottom:12px;">🌟 추천 날짜</div>
+        <div id="recommendChips" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
+      </div>
+    </main>
+  </div>
 </div>
 
-<div id="toast"></div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCi1reez3OB1OtW5uFTe8sLUWE7pZj8A_k",
-    authDomain: "calender-share-62977.firebaseapp.com",
-    projectId: "calender-share-62977",
-    storageBucket: "calender-share-62977.firebasestorage.app",
-    messagingSenderId: "1009398929215",
-    appId: "1:1009398929215:web:b664d6289d948b4509a58a",
-    measurementId: "G-8N28BYYJ4K",
-    databaseURL: "https://calender-share-62977-default-rtdb.firebaseio.com"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const dbRef = ref(db, 'scheduler_v2_lavender');
-
-  const now = new Date();
-  window.calYear = now.getFullYear();
-  window.calMonth = now.getMonth();
-  window.state = { 
-    members: [{id:'admin', name:'관리자 ✨', color:'#495057', isAdmin:true}], 
-    schedules: {} 
-  };
-  window.currentUser = null;
-
-  onValue(dbRef, (snapshot) => {
-    const data = snapshot.val();
-    if (data) window.state = data;
-    renderLogin();
-    renderAll();
-  });
-
-  window.sync = () => set(dbRef, window.state);
-</script>
+<div class="modal-overlay" id="dateModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.3); backdrop-filter:blur(4px); display:none; align-items:center; justify-content:center; z-index:200;">
+  <div class="card" style="width:100%; max-width:380px;">
+    <div id="modalDateLabel" style="font-size:0.8rem; color:var(--pink-400);"></div>
+    <div id="modalDateTitle" style="font-size:1.4rem; font-weight:700; margin-bottom:16px;"></div>
+    <div id="modalMemberList"></div>
+    <button class="btn-primary" style="width:100%; margin-top:20px;" onclick="closeModal()">닫기</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
 
 <script>
-// --- UI & Logic (Lavender Version) ---
-function renderLogin() {
-  const div = document.getElementById('login-buttons');
-  div.innerHTML = '';
-  state.members.forEach(m => {
-    const b = document.createElement('button');
-    b.className = 'btn btn-outline';
-    b.innerHTML = `<span class="color-badge" style="background:${m.color}"></span>${m.name}`;
-    b.onclick = () => login(m.id);
-    div.appendChild(b);
-  });
+// ─────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────
+const STORAGE_KEY = 'schedpink_v3_admin';
+
+function loadState() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) return JSON.parse(raw);
+  return {
+    adminPw: 'admin1234',
+    members: [],
+    schedules: {}
+  };
 }
 
-function login(uid) {
-  currentUser = state.members.find(m => m.id === uid);
-  document.getElementById('view-login').style.display = 'none';
-  document.getElementById('view-app').style.display = 'block';
-  document.getElementById('user-display').textContent = `${currentUser.name}님 날짜를 선택해주세요`;
-  document.getElementById('admin-panel').style.display = currentUser.isAdmin ? 'block' : 'none';
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+let state = loadState();
+let currentUser = null;
+let viewMode = 'personal';
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+
+// ─────────────────────────────────────────
+// LOGIN & APP FLOW
+// ─────────────────────────────────────────
+function renderLoginGrid() {
+  const grid = document.getElementById('memberLoginGrid');
+  grid.innerHTML = state.members.length === 0 
+    ? '<div style="color:var(--gray-400);font-size:.82rem;text-align:center;grid-column:1/-1">멤버가 없습니다. 관리자에게 문의하세요.</div>'
+    : state.members.map(m => `
+        <button class="member-login-btn" onclick="loginMember('${m.id}')">
+          <div class="member-dot" style="background:${m.color}">${m.name.charAt(0)}</div>
+          <span>${m.name}</span>
+        </button>`).join('');
+}
+
+function toggleAdminPw() {
+  const sec = document.getElementById('adminPwSection');
+  sec.style.display = sec.style.display === 'none' ? 'flex' : 'none';
+}
+
+function loginAdmin() {
+  if (document.getElementById('adminPwInput').value === state.adminPw) {
+    currentUser = { id: '_admin', name: '관리자', isAdmin: true };
+    enterApp();
+  } else {
+    showToast('비밀번호가 틀렸습니다');
+  }
+}
+
+function loginMember(id) {
+  const m = state.members.find(x => x.id === id);
+  if (m) { currentUser = { ...m, isAdmin: false }; enterApp(); }
+}
+
+function enterApp() {
+  document.getElementById('loginScreen').classList.remove('active');
+  document.getElementById('appScreen').classList.add('active');
+  
+  const ha = document.getElementById('headerAvatar');
+  document.getElementById('headerUser').style.display = 'flex';
+  ha.style.background = currentUser.isAdmin ? '#333' : currentUser.color;
+  ha.textContent = currentUser.name.charAt(0);
+  document.getElementById('headerName').textContent = currentUser.name;
+  
+  document.getElementById('adminCard').style.display = currentUser.isAdmin ? 'block' : 'none';
   renderAll();
 }
 
-function logout() { location.reload(); }
+function doLogout() {
+  currentUser = null;
+  location.reload();
+}
 
-function renderCalendar() {
-  const body = document.getElementById('calendar-body');
-  const title = document.getElementById('cal-title');
-  body.innerHTML = '';
-  title.textContent = `${calYear}년 ${calMonth+1}월`;
+// ─────────────────────────────────────────
+// ADMIN CORE
+// ─────────────────────────────────────────
+function addMember() {
+  const name = document.getElementById('newMemberName').value.trim();
+  const color = document.getElementById('newMemberColor').value;
+  if (!name) return showToast('이름을 입력하세요');
+  
+  const id = 'u_' + Date.now();
+  state.members.push({ id, name, color });
+  state.schedules[id] = {};
+  saveState();
+  document.getElementById('newMemberName').value = '';
+  renderAll();
+  showToast(`${name} 멤버 추가 완료`);
+}
 
-  ['일','월','화','수','목','금','토'].forEach(d => {
-    const el = document.createElement('div'); el.className='day-label'; el.textContent=d; body.appendChild(el);
-  });
+function renderAdminDetailedList() {
+  const container = document.getElementById('adminDetailedList');
+  if (state.members.length === 0) {
+    container.innerHTML = '<p style="font-size:0.8rem; color:var(--gray-400);">멤버가 없습니다.</p>';
+    return;
+  }
+  container.innerHTML = state.members.map(m => `
+    <div class="admin-member-row">
+      <div class="member-dot" style="background:${m.color}; width:20px; height:20px;"></div>
+      <input type="text" value="${m.name}" onchange="updateMember('${m.id}', 'name', this.value)">
+      <input type="color" value="${m.color}" onchange="updateMember('${m.id}', 'color', this.value)" style="padding:0; height:24px;">
+      <button onclick="removeMember('${m.id}')" style="color:#e53e3e; border:none; background:none; cursor:pointer; font-size:0.75rem;">삭제</button>
+    </div>
+  `).join('');
+}
 
-  const first = new Date(calYear, calMonth, 1).getDay();
-  const last = new Date(calYear, calMonth + 1, 0).getDate();
-  const today = new Date(); today.setHours(0,0,0,0);
-
-  for(let i=0; i<first; i++) body.appendChild(Object.assign(document.createElement('div'), {className:'day empty'}));
-
-  for(let d=1; d<=last; d++) {
-    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const thisDate = new Date(calYear, calMonth, d);
-    const el = document.createElement('div'); el.className = 'day';
-    if(thisDate.getTime() === today.getTime()) el.classList.add('today');
-
-    el.innerHTML = `<span>${d}</span>`;
-
-    const dotBox = document.createElement('div'); dotBox.className = 'dot-container';
-    state.members.filter(m => !m.isAdmin).forEach(m => {
-      if(state.schedules[m.id] && state.schedules[m.id][dateStr]) {
-        const dot = document.createElement('div');
-        dot.className = 'dot'; dot.style.background = m.color;
-        dotBox.appendChild(dot);
-      }
-    });
-    el.appendChild(dotBox);
-
-    if (thisDate < today) {
-      el.classList.add('disabled');
-    } else if (!currentUser.isAdmin) {
-      const isBlocked = state.schedules[currentUser.id]?.[dateStr];
-      if (isBlocked) el.style.boxShadow = `inset 0 0 0 2px ${currentUser.color}`;
-      el.onclick = () => {
-        if(!state.schedules[currentUser.id]) state.schedules[currentUser.id] = {};
-        const sched = state.schedules[currentUser.id];
-        if(sched[dateStr]) delete sched[dateStr]; else sched[dateStr] = true;
-        renderSubmitBar();
-        renderAll();
-      };
-    }
-    body.appendChild(el);
+function updateMember(id, field, value) {
+  const m = state.members.find(x => x.id === id);
+  if (m) {
+    m[field] = value;
+    saveState();
+    renderAll();
+    showToast('멤버 정보가 수정되었습니다');
   }
 }
 
-function renderSubmitBar() {
-  const bar = document.getElementById('submit-bar');
-  if (currentUser && !currentUser.isAdmin) {
-    bar.classList.add('active');
-    const userSched = state.schedules[currentUser.id] || {};
-    const count = Object.keys(userSched).length;
-    document.getElementById('submit-info').innerHTML = `현재 <strong>${count}일</strong> 선택됨`;
-  }
+function removeMember(id) {
+  if (!confirm('해당 멤버와 모든 일정 데이터를 삭제할까요?')) return;
+  state.members = state.members.filter(m => m.id !== id);
+  delete state.schedules[id];
+  saveState();
+  renderAll();
 }
 
+function changeAdminPw() {
+  const np = document.getElementById('newPwInput').value.trim();
+  if (!np) return showToast('새 비밀번호를 입력하세요');
+  state.adminPw = np;
+  saveState();
+  document.getElementById('newPwInput').value = '';
+  showToast('관리자 비밀번호 변경 완료');
+}
+
+function resetAll() {
+  if (!confirm('정말 모든 멤버의 일정 데이터를 초기화하시겠습니까?')) return;
+  Object.keys(state.schedules).forEach(k => state.schedules[k] = {});
+  saveState();
+  renderAll();
+  showToast('모든 일정 데이터 초기화 완료');
+}
+
+// ─────────────────────────────────────────
+// CALENDAR & UI LOGIC (기존 로직 유지하되 관리자 제외 처리)
+// ─────────────────────────────────────────
 function renderAll() {
   renderCalendar();
-  renderLegend();
-  renderAdminList();
-  renderRecommend();
-}
-
-function renderLegend() {
-  const div = document.getElementById('member-legend');
-  div.innerHTML = '';
-  state.members.filter(m => !m.isAdmin).forEach(m => {
-    div.innerHTML += `<span><span class="color-badge" style="background:${m.color}"></span>${m.name}</span>`;
-  });
-}
-
-function renderAdminList() {
-  const list = document.getElementById('admin-member-list');
-  list.innerHTML = '';
-  state.members.filter(m => !m.isAdmin).forEach(m => {
-    const li = document.createElement('li');
-    li.className = 'status-item';
-    li.innerHTML = `<span><span class="color-badge" style="background:${m.color}"></span>${m.name}</span>
-                    <button class="btn btn-outline" onclick="removeMember('${m.id}')" style="padding:4px 8px; color:red; border-color:#ffcfcf;">삭제</button>`;
-    list.appendChild(li);
-  });
-}
-
-function addMember() {
-  const name = document.getElementById('new-name').value;
-  const color = document.getElementById('new-color').value;
-  if(!name) return;
-  state.members.push({id: 'u'+Date.now(), name, color, isAdmin:false});
-  document.getElementById('new-name').value = '';
-  sync();
-}
-
-function removeMember(uid) {
-  if(!confirm('정말 삭제할까요?')) return;
-  state.members = state.members.filter(m => m.id !== uid);
-  delete state.schedules[uid];
-  sync();
-}
-
-function submitSchedule() {
-  sync();
-  document.getElementById('submit-bar').classList.remove('active');
-  showToast('서버에 안전하게 저장되었습니다!');
-}
-
-function showToast(m) {
-  const t = document.getElementById('toast'); t.textContent=m; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-function renderRecommend() {
-  const box = document.getElementById('recommend-box');
-  const members = state.members.filter(m => !m.isAdmin);
-  if(members.length === 0) { box.textContent = "관리자 탭에서 친구를 추가해 주세요!"; return; }
-  
-  const last = new Date(calYear, calMonth + 1, 0).getDate();
-  let bestDays = [];
-  const today = new Date(); today.setHours(0,0,0,0);
-
-  for(let d=1; d<=last; d++) {
-    const thisDate = new Date(calYear, calMonth, d);
-    if(thisDate < today) continue;
-    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    let count = 0;
-    members.forEach(m => { if(!state.schedules[m.id]?.[dateStr]) count++; });
-    if(count > 0) bestDays.push({d, count});
-  }
-
-  bestDays.sort((a,b) => b.count - a.count);
-  const top = bestDays.slice(0, 3);
-  box.innerHTML = (top.length ? top.map(x => `<div><strong>${x.d}일</strong>: ${x.count}명 가능</div>`).join('') : "모두 가능한 날이 없어요 ㅠㅠ");
-}
-
-function clearMySchedule() {
-  if (!currentUser || currentUser.isAdmin) return;
-  state.schedules[currentUser.id] = {};
-  renderAll();
+  renderMemberStatus();
+  renderStats();
   renderSubmitBar();
+  renderRecommend();
+  if (currentUser && currentUser.isAdmin) renderAdminDetailedList();
 }
+
+function renderMemberStatus() {
+  const el = document.getElementById('memberStatusList');
+  if (state.members.length === 0) return el.innerHTML = '<div style="font-size:.8rem;color:var(--gray-400)">멤버 없음</div>';
+  
+  el.innerHTML = state.members.map(m => {
+    const sched = state.schedules[m.id] || {};
+    const submitted = Object.keys(sched).some(k => k.startsWith(`${calYear}-${String(calMonth+1).padStart(2,'0')}`));
+    return `
+      <div class="member-item ${submitted ? 'submitted' : ''}">
+        <div class="member-dot" style="background:${m.color};width:24px;height:24px;font-size:0.7rem;">${m.name.charAt(0)}</div>
+        <span class="member-item-name" style="font-size:0.85rem;">${m.name}</span>
+        <span class="status-badge ${submitted ? 'done' : 'pending'}" style="font-size:0.65rem;">${submitted ? '완료' : '대기'}</span>
+      </div>`;
+  }).join('');
+}
+
+function renderStats() {
+  const el = document.getElementById('statsContent');
+  const total = state.members.length;
+  if (total === 0) return el.innerHTML = '-';
+  
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  let allFreeCount = 0;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dk = dateKey(calYear, calMonth, d);
+    if (!state.members.some(m => state.schedules[m.id]?.[dk])) allFreeCount++;
+  }
+  el.innerHTML = `
+    <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px;"><span>등록 멤버</span><b>${total}명</b></div>
+    <div style="display:flex; justify-content:space-between; font-size:0.85rem;"><span>전원 가능일</span><b style="color:var(--pink-500)">${allFreeCount}일</b></div>
+  `;
+}
+
+// [기존 캘린더 관련 함수 changeMonth, switchView, dateKey, toggleDay, renderCalendar, openModal, closeModal, renderRecommend, renderSubmitBar, showToast 동일하게 유지]
+function changeMonth(delta) { calMonth += delta; if (calMonth > 11) { calMonth = 0; calYear++; } if (calMonth < 0) { calMonth = 11; calYear--; } renderAll(); }
+function switchView(v) { viewMode = v; document.getElementById('tabPersonal').classList.toggle('active', v==='personal'); document.getElementById('tabGroup').classList.toggle('active', v==='group'); renderAll(); }
+function dateKey(y, m, d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+function toggleDay(dateStr) { if (!currentUser || currentUser.isAdmin) return; if (!state.schedules[currentUser.id]) state.schedules[currentUser.id] = {}; if (state.schedules[currentUser.id][dateStr]) delete state.schedules[currentUser.id][dateStr]; else state.schedules[currentUser.id][dateStr] = 'blocked'; saveState(); renderAll(); }
+
+function renderCalendar() {
+  const label = document.getElementById('calMonthLabel');
+  label.textContent = `${calYear}년 ${calMonth+1}월`;
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const container = document.getElementById('calDays');
+  container.innerHTML = '';
+  for (let i = 0; i < firstDay; i++) container.appendChild(Object.assign(document.createElement('div'), {className:'cal-day empty'}));
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dk = dateKey(calYear, calMonth, d);
+    const el = document.createElement('div'); el.className = 'cal-day';
+    const numEl = document.createElement('div'); numEl.className = 'day-num'; numEl.textContent = d;
+    el.appendChild(numEl);
+    if (viewMode === 'personal') {
+      if (currentUser && !currentUser.isAdmin && state.schedules[currentUser.id]?.[dk]) {
+        el.classList.add('blocked');
+        el.innerHTML += '<div class="blocked-x" style="position:absolute; bottom:8px; right:8px; background:#fff; color:var(--pink-500); width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; border:1px solid var(--pink-200);">X</div>';
+      } else if (currentUser && currentUser.isAdmin) {
+        const dots = document.createElement('div'); dots.className = 'day-dots'; dots.style.display='flex'; dots.style.gap='2px';
+        state.members.forEach(m => { if(state.schedules[m.id]?.[dk]) dots.innerHTML += `<div class="day-dot" style="background:${m.color}"></div>`; });
+        el.appendChild(dots);
+      }
+      el.onclick = () => currentUser.isAdmin ? openModal(dk, d) : toggleDay(dk);
+    } else {
+      const dots = document.createElement('div'); dots.className = 'day-dots'; dots.style.display='flex'; dots.style.gap='2px';
+      let blockedCount = 0;
+      state.members.forEach(m => { if(state.schedules[m.id]?.[dk]) { blockedCount++; dots.innerHTML += `<div class="day-dot" style="background:${m.color}"></div>`; }});
+      el.appendChild(dots);
+      if (blockedCount === 0 && state.members.length > 0) el.style.background = '#f0fdf4';
+      el.onclick = () => openModal(dk, d);
+    }
+    container.appendChild(el);
+  }
+}
+
+function openModal(dk, d) {
+  document.getElementById('modalDateLabel').textContent = `${calYear}년 ${calMonth+1}월`;
+  document.getElementById('modalDateTitle').textContent = `${d}일 현황`;
+  const list = document.getElementById('modalMemberList');
+  list.innerHTML = state.members.map(m => {
+    const isBlocked = !!state.schedules[m.id]?.[dk];
+    return `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #eee;">
+      <span><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${m.color}; margin-right:8px;"></span>${m.name}</span>
+      <b style="color:${isBlocked ? '#e53e3e':'#065f46'}">${isBlocked ? '불가':'가능'}</b>
+    </div>`;
+  }).join('');
+  document.getElementById('dateModal').style.display = 'flex';
+}
+function closeModal() { document.getElementById('dateModal').style.display = 'none'; }
+function renderSubmitBar() {
+  const bar = document.getElementById('submitBar');
+  if (!currentUser || currentUser.isAdmin || viewMode === 'group') { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  const count = Object.keys(state.schedules[currentUser.id] || {}).filter(k => k.startsWith(`${calYear}-${String(calMonth+1).padStart(2,'0')}`)).length;
+  document.getElementById('submitInfo').innerHTML = `<span style="font-size:0.9rem;">이번 달 <b>${count}일</b> 불가</span>`;
+}
+function submitSchedule() { saveState(); showToast('일정이 저장되었습니다.'); renderAll(); }
+function showToast(msg) { 
+  const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; t.style.position='fixed'; t.style.bottom='20px'; t.style.left='50%'; t.style.transform='translateX(-50%)'; t.style.background='#333'; t.style.color='#fff'; t.style.padding='10px 20px'; t.style.borderRadius='20px'; t.style.zIndex='1000';
+  setTimeout(() => t.style.display='none', 2000);
+}
+function renderRecommend() {
+  const sec = document.getElementById('recommendSection');
+  if (viewMode !== 'group' || state.members.length === 0) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const scores = [];
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dk = dateKey(calYear, calMonth, d);
+    let freeCount = 0; state.members.forEach(m => { if (!state.schedules[m.id]?.[dk]) freeCount++; });
+    scores.push({ d, dk, freeCount });
+  }
+  scores.sort((a,b) => b.freeCount - a.freeCount);
+  const top = scores.slice(0, 3).filter(s => s.freeCount > 0);
+  document.getElementById('recommendChips').innerHTML = top.map(s => `<div style="background:var(--pink-100); padding:8px 16px; border-radius:12px; font-size:0.85rem;"><b>${s.d}일</b> (${s.freeCount}명 가능)</div>`).join('');
+}
+
+// ─────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────
+renderLoginGrid();
 </script>
 </body>
 </html>
