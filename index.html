@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Friend Scheduler - Lavender Edition</title>
+<title>Friend Scheduler - HS Calendar</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
   :root {
@@ -258,7 +258,7 @@ function login(uid) {
   currentUser = state.members.find(m => m.id === uid);
   document.getElementById('view-login').style.display = 'none';
   document.getElementById('view-app').style.display = 'block';
-  document.getElementById('user-display').textContent = `${currentUser.name}님 환영해요 💜`;
+  document.getElementById('user-display').textContent = `${currentUser.name}님 날짜를 선택해주세요`;
   document.getElementById('admin-panel').style.display = currentUser.isAdmin ? 'block' : 'none';
   renderAll();
 }
