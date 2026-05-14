@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HS Calendar - Lavender Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    /* Lavender Purple Tones */
+    --pink-50:  #f8f7ff;
+    --pink-100: #f3f0ff;
+    --pink-200: #e5dbff;
+    --pink-300: #d0bfff;
+    --pink-400: #b197fc;
+    --pink-500: #9775fa;
+    --pink-600: #845ef7;
+    --rose-100: #f4f2ff;
+    --rose-200: #ede9fe;
+    --rose-300: #ddd6fe;
+    --white:    #ffffff;
+    --gray-50:  #f8f9fa;
+    --gray-100: #f1f3f5;
+    --gray-200: #e9ecef;
+    --gray-400: #adb5bd;
+    --gray-600: #868e96;
+    --gray-800: #495057;
+    --shadow-sm: 0 2px 8px rgba(151, 117, 250, 0.10);
+    --shadow-md: 0 6px 24px rgba(151, 117, 250, 0.15);
+    --shadow-lg: 0 16px 48px rgba(151, 117, 250, 0.18);
+    --radius: 20px;
+    --radius-sm: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    /* 배경 그라데이션도 라벤더 톤에 맞춰 수정 */
+    background: linear-gradient(135deg, #f8f7ff 0%, #f3f0ff 40%, #f1f3f5 100%);
+    min-height: 100vh;
+    color: var(--gray-800);
+  }
+
+  /* ── scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--pink-50); }
+  ::-webkit-scrollbar-thumb { background: var(--pink-200); border-radius: 99px; }
+
+  /* ── HEADER ── */
+  .header {
+    background: rgba(255,255,255,.85);
+    backdrop-filter: blur(18px);
+    border-bottom: 1.5px solid var(--pink-100);
+    padding: 0 32px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
+  }
+  .header-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--pink-500);
+    letter-spacing: -.5px;
+  }
+  .header-logo span { color: var(--gray-800); }
+  .header-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: .88rem;
+    font-weight: 500;
+    color: var(--gray-600);
+  }
+  .header-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: .82rem;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(151,117,250,.3);
+    flex-shrink: 0;
+  }
+  .btn-logout {
+    background: var(--pink-50);
+    border: 1.5px solid var(--pink-200);
+    color: var(--pink-500);
+    border-radius: 99px;
+    padding: 6px 16px;
+    font-size: .82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-logout:hover { background: var(--pink-100); }
+
+  /* ── SCREENS ── */
+  .screen { display: none; animation: fadeUp .4s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* ── LOGIN SCREEN ── */
+  #loginScreen {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 0;
+    padding: 40px 20px;
+  }
+  #loginScreen.active { display: flex; }
+
+  .login-card {
+    background: rgba(255,255,255,.92);
+    border: 1.5px solid var(--pink-100);
+    border-radius: 28px;
+    padding: 44px 40px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: var(--shadow-lg);
+  }
+  .login-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--pink-500);
+    margin-bottom: 4px;
+    text-align: center;
+  }
+  .login-sub {
+    font-size: .88rem;
+    color: var(--gray-400);
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .login-section-title {
+    font-size: .78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--pink-400);
+    margin-bottom: 12px;
+  }
+
+  .member-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .member-login-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--pink-100);
+    background: var(--pink-50);
+    cursor: pointer;
+    font-size: .88rem;
+    font-weight: 500;
+    color: var(--gray-800);
+    transition: all .22s;
+  }
+  .member-login-btn:hover {
+    border-color: var(--pink-300);
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-2px);
+  }
+  .member-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .72rem;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .divider {
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, var(--pink-200), transparent);
+    margin: 20px 0;
+  }
+
+  .admin-toggle-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: var(--radius-sm);
+    border: 1.5px dashed var(--pink-300);
+    background: transparent;
+    color: var(--pink-500);
+    font-size: .88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .admin-toggle-btn:hover { background: var(--pink-50); }
+
+  .admin-pw-section { margin-top: 14px; display: none; }
+  .admin-pw-section.open { display: flex; gap: 8px; }
+
+  /* ── INPUTS ── */
+  .inp {
+    width: 100%;
+    padding: 11px 16px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--pink-200);
+    background: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .88rem;
+    color: var(--gray-800);
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .inp:focus { border-color: var(--pink-400); box-shadow: 0 0 0 3px rgba(151,117,250,.1); }
+  .inp::placeholder { color: var(--gray-400); }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 11px 22px;
+    border-radius: 99px;
+    border: none;
+    background: linear-gradient(135deg, var(--pink-400), var(--pink-500));
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .22s;
+    box-shadow: 0 4px 14px rgba(151,117,250,.35);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(151,117,250,.4); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 11px 22px;
+    border-radius: 99px;
+    border: 1.5px solid var(--pink-200);
+    background: var(--white);
+    color: var(--pink-500);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .22s;
+  }
+  .btn-secondary:hover { background: var(--pink-50); border-color: var(--pink-300); }
+
+  .btn-danger {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 8px 16px;
+    border-radius: 99px;
+    border: none;
+    background: #f8f9fa;
+    color: #e53e3e;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-danger:hover { background: #ffebeb; }
+
+  /* ── MAIN LAYOUT ── */
+  .app-layout {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .card {
+    background: rgba(255,255,255,.9);
+    border: 1.5px solid var(--pink-100);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: var(--shadow-sm);
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title-icon {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--pink-100), var(--rose-200));
+    display: flex; align-items: center; justify-content: center;
+    font-size: .82rem;
+  }
+
+  /* member list in sidebar */
+  .member-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    background: var(--pink-50);
+    border: 1.5px solid transparent;
+    transition: all .2s;
+  }
+  .member-item:last-child { margin-bottom: 0; }
+  .member-item.submitted { border-color: var(--pink-200); background: var(--rose-100); }
+  .member-item-name { font-size: .88rem; font-weight: 500; flex: 1; }
+  .status-badge {
+    font-size: .72rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 99px;
+  }
+  .status-badge.done { background: #d1fae5; color: #065f46; }
+  .status-badge.pending { background: var(--pink-100); color: var(--pink-500); }
+
+  /* stats */
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--pink-100);
+    font-size: .85rem;
+  }
+  .stat-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .stat-val {
+    font-weight: 700;
+    color: var(--pink-500);
+    font-size: .95rem;
+  }
+
+  /* admin controls */
+  .admin-form { display: flex; flex-direction: column; gap: 10px; }
+  .color-row { display: flex; gap: 8px; align-items: center; }
+  .color-inp {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    border: 1.5px solid var(--pink-200);
+    padding: 2px;
+    cursor: pointer;
+    background: none;
+  }
+  .admin-member-list { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+  .admin-member-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--pink-50);
+    font-size: .85rem;
+  }
+  .admin-member-row span { flex: 1; font-weight: 500; }
+
+  .pw-change-form { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+
+  /* ── CALENDAR AREA ── */
+  .calendar-area { display: flex; flex-direction: column; gap: 20px; }
+
+  .cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .cal-month-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--gray-800);
+  }
+  .cal-nav-btn {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid var(--pink-200);
+    background: var(--white);
+    color: var(--pink-500);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+  }
+  .cal-nav-btn:hover { background: var(--pink-50); border-color: var(--pink-300); }
+
+  .cal-view-tabs {
+    display: flex;
+    gap: 6px;
+    background: var(--pink-50);
+    border: 1.5px solid var(--pink-100);
+    border-radius: 99px;
+    padding: 4px;
+  }
+  .cal-view-tab {
+    padding: 7px 18px;
+    border-radius: 99px;
+    border: none;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .cal-view-tab.active {
+    background: linear-gradient(135deg, var(--pink-400), var(--pink-500));
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(151,117,250,.3);
+  }
+
+  .cal-grid-wrapper {
+    background: rgba(255,255,255,.92);
+    border: 1.5px solid var(--pink-100);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+
+  .cal-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: linear-gradient(90deg, var(--pink-50), var(--rose-100));
+    border-bottom: 1.5px solid var(--pink-100);
+  }
+  .cal-weekday {
+    text-align: center;
+    padding: 12px 4px;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    color: var(--gray-600);
+  }
+  .cal-weekday:first-child { color: #e53e3e; }
+  .cal-weekday:last-child  { color: var(--pink-500); }
+
+  .cal-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0;
+  }
+
+  .cal-day {
+    min-height: 90px;
+    padding: 8px;
+    border-right: 1px solid var(--pink-100);
+    border-bottom: 1px solid var(--pink-100);
+    cursor: pointer;
+    transition: background .18s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .cal-day:nth-child(7n) { border-right: none; }
+  .cal-day.empty { background: var(--pink-50); cursor: default; opacity: .5; }
+  .cal-day.today { background: linear-gradient(135deg, #f8f7ff, #ede9fe); }
+
+  /* personal mode */
+  .cal-day.blocked {
+    background: linear-gradient(135deg, #ede9fe, #ddd6fe) !important;
+  }
+  .cal-day.blocked .day-num { color: #845ef7; }
+  .cal-day:not(.empty):not(.blocked):hover { background: var(--pink-50); }
+
+  /* group mode */
+  .cal-day.all-free {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7) !important;
+    border-color: #86efac;
+  }
+  .cal-day.all-free .day-num { color: #15803d; }
+  .cal-day.partly-free { background: var(--white); }
+  .cal-day.all-blocked { background: #f8f9fa !important; }
+
+  .day-num {
+    font-size: .88rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    line-height: 1;
+  }
+  .cal-day.sunday .day-num  { color: #e53e3e; }
+  .cal-day.saturday .day-num{ color: var(--pink-500); }
+
+  .day-dots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin-top: 2px;
+  }
+  .day-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    opacity: .85;
+  }
+  .day-dot.unavailable { opacity: .35; }
+
+  .day-recommend-star {
+    position: absolute;
+    top: 6px; right: 7px;
+    font-size: .9rem;
+    color: var(--pink-400);
+    animation: twinkle 2s ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:.5; transform:scale(.85); }
+  }
+
+  .blocked-x {
+    position: absolute;
+    bottom: 7px; right: 7px;
+    font-size: .72rem;
+    font-weight: 800;
+    color: #845ef7;
+    background: #ede9fe;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── RECOMMEND SECTION ── */
+  .recommend-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin-bottom: 12px;
+  }
+  .recommend-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .recommend-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 99px;
+    background: linear-gradient(135deg, var(--pink-50), var(--rose-100));
+    border: 1.5px solid var(--pink-200);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .recommend-chip.top {
+    background: linear-gradient(135deg, var(--pink-400), var(--pink-500));
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(151,117,250,.35);
+  }
+  .recommend-chip:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+  .recommend-chip .chip-date { font-size: .85rem; font-weight: 600; }
+  .recommend-chip .chip-tag { font-size: .72rem; opacity: .8; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(73, 80, 87, 0.25);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--white);
+    border: 1.5px solid var(--pink-100);
+    border-radius: var(--radius);
+    padding: 32px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: var(--shadow-lg);
+    animation: fadeUp .3s ease;
+  }
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin-bottom: 16px;
+  }
+  .modal-date-label {
+    font-size: .78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--pink-400);
+    margin-bottom: 12px;
+  }
+  .modal-member-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--pink-100);
+  }
+  .modal-member-row:last-child { border-bottom: none; }
+  .modal-status {
+    margin-left: auto;
+    font-size: .8rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 99px;
+  }
+  .modal-status.ok { background: #d1fae5; color: #065f46; }
+  .modal-status.no { background: #f1f3f5; color: #868e96; }
+  .modal-close-btn {
+    margin-top: 20px;
+    width: 100%;
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 28px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: linear-gradient(135deg, var(--pink-500), var(--pink-400));
+    color: #fff;
+    padding: 13px 24px;
+    border-radius: 99px;
+    font-size: .88rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-md);
+    z-index: 999;
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── SUBMIT BAR ── */
+  .submit-bar {
+    background: linear-gradient(90deg, rgba(255,255,255,.95), rgba(248,247,255,.95));
+    border: 1.5px solid var(--pink-200);
+    border-radius: var(--radius);
+    padding: 16px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: var(--shadow-sm);
+    flex-wrap: wrap;
+  }
+  .submit-info { font-size: .88rem; color: var(--gray-600); }
+  .submit-info strong { color: var(--pink-500); font-size: 1rem; }
+
+  /* ── DECORATIVE BG ── */
+  .bg-blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: .18;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob-1 { width:520px; height:520px; background:var(--pink-400); top:-140px; right:-120px; }
+  .blob-2 { width:400px; height:400px; background:var(--rose-300); bottom:-100px; left:-100px; }
+
+  .content-wrap { position: relative; z-index: 1; }
+
+  @media (max-width: 900px) {
+    .app-layout { grid-template-columns: 1fr; }
+    .sidebar { order: 2; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-blob blob-1"></div>
+<div class="bg-blob blob-2"></div>
+
+<header class="header content-wrap">
+  <div class="header-logo">Sched<span>purple</span></div>
+  <div class="header-user" id="headerUser" style="display:none">
+    <div class="header-avatar" id="headerAvatar"></div>
+    <span id="headerName"></span>
+    <button class="btn-logout" onclick="doLogout()">나가기</button>
+  </div>
+</header>
+
+<div id="loginScreen" class="screen active">
+  <div class="login-card">
+    <div class="login-title">HS Calendar</div>
+    <div class="login-sub">우리들의 라벤더 캘린더</div>
+
+    <div class="login-section-title">멤버 선택</div>
+    <div class="member-grid" id="memberLoginGrid">
+      <div style="color:var(--gray-400);font-size:.82rem;padding:8px;grid-column:1/-1">
+        관리자가 멤버를 추가해 주세요.
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="admin-toggle-btn" onclick="toggleAdminPw()">관리자 로그인</button>
+    <div class="admin-pw-section" id="adminPwSection">
+      <input class="inp" id="adminPwInput" type="password" placeholder="비밀번호 입력" style="flex:1" />
+      <button class="btn-primary" onclick="loginAdmin()">입장</button>
+    </div>
+  </div>
+</div>
+
+<div id="appScreen" class="screen content-wrap">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="card" id="memberStatusCard">
+        <div class="card-title">
+          <div class="card-title-icon">+</div>
+          멤버 현황
+        </div>
+        <div id="memberStatusList"></div>
+      </div>
+
+      <div class="card" id="statsCard">
+        <div class="card-title">
+          <div class="card-title-icon">~</div>
+          이번 달 통계
+        </div>
+        <div id="statsContent"></div>
+      </div>
+
+      <div class="card" id="adminCard" style="display:none">
+        <div class="card-title">
+          <div class="card-title-icon">*</div>
+          관리자 패널
+        </div>
+        <div class="admin-form">
+          <div style="font-size:.78rem;font-weight:700;color:var(--pink-400);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">멤버 추가</div>
+          <input class="inp" id="newMemberName" placeholder="이름 입력" />
+          <div class="color-row">
+            <input class="color-inp" type="color" id="newMemberColor" value="#9775fa" />
+            <span style="font-size:.82rem;color:var(--gray-600)">고유 색상 선택</span>
+            <button class="btn-primary" style="margin-left:auto;padding:9px 18px" onclick="addMember()">추가</button>
+          </div>
+        </div>
+        <div class="admin-member-list" id="adminMemberList"></div>
+        <div class="divider" style="margin:16px 0"></div>
+        <button class="btn-danger" style="width:100%" onclick="resetAll()">전체 데이터 초기화</button>
+      </div>
+    </aside>
+
+    <main class="calendar-area">
+      <div class="cal-header">
+        <button class="cal-nav-btn" onclick="changeMonth(-1)">&#8592;</button>
+        <div class="cal-month-label" id="calMonthLabel"></div>
+        <button class="cal-nav-btn" onclick="changeMonth(1)">&#8594;</button>
+        <div class="cal-view-tabs">
+          <button class="cal-view-tab active" id="tabPersonal" onclick="switchView('personal')">내 일정</button>
+          <button class="cal-view-tab" id="tabGroup" onclick="switchView('group')">그룹 보기</button>
+        </div>
+      </div>
+
+      <div class="submit-bar" id="submitBar">
+        <div class="submit-info" id="submitInfo"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-secondary" onclick="clearMySchedule()">선택 초기화</button>
+          <button class="btn-primary" onclick="submitSchedule()">일정 전송</button>
+        </div>
+      </div>
+
+      <div class="cal-grid-wrapper">
+        <div class="cal-weekdays">
+          <div class="cal-weekday">일</div>
+          <div class="cal-weekday">월</div>
+          <div class="cal-weekday">화</div>
+          <div class="cal-weekday">수</div>
+          <div class="cal-weekday">목</div>
+          <div class="cal-weekday">금</div>
+          <div class="cal-weekday">토</div>
+        </div>
+        <div class="cal-days" id="calDays"></div>
+      </div>
+
+      <div class="card recommend-section" id="recommendSection" style="display:none">
+        <div class="recommend-title">추천 날짜</div>
+        <div class="recommend-chips" id="recommendChips"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dateModal">
+  <div class="modal-box">
+    <div class="modal-date-label" id="modalDateLabel"></div>
+    <div class="modal-title" id="modalDateTitle"></div>
+    <div id="modalMemberList"></div>
+    <button class="btn-primary modal-close-btn" onclick="closeModal()">닫기</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// --- JS 로직 부분은 동일하되 초기 설정값만 퍼플 톤에 맞춰 조정되었습니다 ---
+const STORAGE_KEY = 'schedpurple_v1';
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return {
+    adminPw: 'admin1234',
+    members: [],
+    schedules: {}
+  };
+}
+
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+let state = loadState();
+let currentUser = null;
+let viewMode = 'personal';
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+
+function renderLoginGrid() {
+  const grid = document.getElementById('memberLoginGrid');
+  if (state.members.length === 0) {
+    grid.innerHTML = '<div style="color:var(--gray-400);font-size:.82rem;padding:8px;grid-column:1/-1">관리자가 멤버를 추가해 주세요.</div>';
+    return;
+  }
+  grid.innerHTML = state.members.map(m => `
+    <button class="member-login-btn" onclick="loginMember('${m.id}')">
+      <div class="member-dot" style="background:${m.color}">${m.name.charAt(0)}</div>
+      <span>${m.name}</span>
+    </button>
+  `).join('');
+}
+
+function toggleAdminPw() {
+  const sec = document.getElementById('adminPwSection');
+  sec.classList.toggle('open');
+}
+
+function loginAdmin() {
+  const pw = document.getElementById('adminPwInput').value;
+  if (pw === state.adminPw) {
+    currentUser = { id: '_admin', name: '관리자', color: '#9775fa', isAdmin: true };
+    enterApp();
+  } else {
+    showToast('비밀번호가 틀렸습니다');
+  }
+}
+
+function loginMember(id) {
+  const m = state.members.find(x => x.id === id);
+  if (!m) return;
+  currentUser = { ...m, isAdmin: false };
+  enterApp();
+}
+
+function enterApp() {
+  document.getElementById('loginScreen').classList.remove('active');
+  document.getElementById('appScreen').classList.add('active');
+  const ha = document.getElementById('headerAvatar');
+  document.getElementById('headerUser').style.display = 'flex';
+  ha.style.background = currentUser.color;
+  ha.textContent = currentUser.name.charAt(0);
+  document.getElementById('headerName').textContent = currentUser.name;
+  document.getElementById('adminCard').style.display = currentUser.isAdmin ? 'block' : 'none';
+  renderAll();
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('loginScreen').classList.add('active');
+  document.getElementById('appScreen').classList.remove('active');
+  document.getElementById('headerUser').style.display = 'none';
+  renderLoginGrid();
+}
+
+function addMember() {
+  const name = document.getElementById('newMemberName').value.trim();
+  const color = document.getElementById('newMemberColor').value;
+  if (!name) return;
+  const id = 'u_' + Date.now();
+  state.members.push({ id, name, color });
+  if (!state.schedules[id]) state.schedules[id] = {};
+  saveState();
+  document.getElementById('newMemberName').value = '';
+  renderAll();
+  renderLoginGrid();
+}
+
+function removeMember(id) {
+  state.members = state.members.filter(m => m.id !== id);
+  delete state.schedules[id];
+  saveState();
+  renderAll();
+  renderLoginGrid();
+}
+
+function renderAdminMemberList() {
+  const el = document.getElementById('adminMemberList');
+  el.innerHTML = state.members.map(m => `
+    <div class="admin-member-row">
+      <div class="member-dot" style="background:${m.color};width:24px;height:24px;font-size:.7rem">${m.name.charAt(0)}</div>
+      <span>${m.name}</span>
+      <button class="btn-danger" style="padding:4px 10px;font-size:.75rem" onclick="removeMember('${m.id}')">삭제</button>
+    </div>
+  `).join('');
+}
+
+function resetAll() {
+  if (!confirm('초기화할까요?')) return;
+  state.schedules = {};
+  saveState();
+  renderAll();
+}
+
+function changeMonth(delta) {
+  calMonth += delta;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar();
+  renderRecommend();
+}
+
+function switchView(v) {
+  viewMode = v;
+  document.getElementById('tabPersonal').classList.toggle('active', v === 'personal');
+  document.getElementById('tabGroup').classList.toggle('active', v === 'group');
+  renderCalendar();
+  renderRecommend();
+  renderSubmitBar();
+}
+
+function dateKey(y, m, d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+
+function toggleDay(dateStr) {
+  if (!currentUser || currentUser.isAdmin) return;
+  const uid = currentUser.id;
+  if (!state.schedules[uid]) state.schedules[uid] = {};
+  if (state.schedules[uid][dateStr]) delete state.schedules[uid][dateStr];
+  else state.schedules[uid][dateStr] = 'blocked';
+  saveState();
+  renderCalendar();
+  renderSubmitBar();
+}
+
+function renderCalendar() {
+  const label = document.getElementById('calMonthLabel');
+  label.textContent = `${calYear}년 ${calMonth+1}월`;
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const container = document.getElementById('calDays');
+  container.innerHTML = '';
+
+  for (let i = 0; i < firstDay; i++) {
+    const el = document.createElement('div');
+    el.className = 'cal-day empty';
+    container.appendChild(el);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dk = dateKey(calYear, calMonth, d);
+    const dayOfWeek = (firstDay + d - 1) % 7;
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    if (dayOfWeek === 0) el.classList.add('sunday');
+    if (dayOfWeek === 6) el.classList.add('saturday');
+    const numEl = document.createElement('div');
+    numEl.className = 'day-num';
+    numEl.textContent = d;
+    el.appendChild(numEl);
+    if (viewMode === 'personal') renderPersonalDay(el, dk, d);
+    else renderGroupDay(el, dk, d);
+    container.appendChild(el);
+  }
+}
+
+function renderPersonalDay(el, dk, d) {
+  if (!currentUser || currentUser.isAdmin) {
+    const dots = document.createElement('div');
+    dots.className = 'day-dots';
+    state.members.forEach(m => {
+      const dot = document.createElement('div');
+      dot.className = 'day-dot' + (state.schedules[m.id]?.[dk] ? ' unavailable' : '');
+      dot.style.background = m.color;
+      dots.appendChild(dot);
+    });
+    el.appendChild(dots);
+    el.onclick = () => openModal(dk, d);
+    return;
+  }
+  if (state.schedules[currentUser.id]?.[dk]) {
+    el.classList.add('blocked');
+    const x = document.createElement('div');
+    x.className = 'blocked-x'; x.textContent = 'X';
+    el.appendChild(x);
+  }
+  el.onclick = () => toggleDay(dk);
+}
+
+function renderGroupDay(el, dk, d) {
+  const total = state.members.length;
+  if (total === 0) return;
+  let blockedCount = 0;
+  const dots = document.createElement('div');
+  dots.className = 'day-dots';
+  state.members.forEach(m => {
+    const dot = document.createElement('div');
+    const isBlocked = !!state.schedules[m.id]?.[dk];
+    if (isBlocked) blockedCount++;
+    dot.className = 'day-dot' + (isBlocked ? ' unavailable' : '');
+    dot.style.background = m.color;
+    dots.appendChild(dot);
+  });
+  el.appendChild(dots);
+  if (blockedCount === 0) {
+    el.classList.add('all-free');
+    const star = document.createElement('div');
+    star.className = 'day-recommend-star'; star.textContent = '*';
+    el.appendChild(star);
+  } else if (blockedCount === total) el.classList.add('all-blocked');
+  el.onclick = () => openModal(dk, d);
+}
+
+function openModal(dk, d) {
+  const [y, m] = dk.split('-');
+  document.getElementById('modalDateLabel').textContent = `${y}년 ${parseInt(m)}월`;
+  document.getElementById('modalDateTitle').textContent = `${parseInt(d)}일`;
+  const list = document.getElementById('modalMemberList');
+  list.innerHTML = state.members.map(m => {
+    const blocked = !!state.schedules[m.id]?.[dk];
+    return `
+      <div class="modal-member-row">
+        <div class="member-dot" style="background:${m.color};width:28px;height:28px;">${m.name.charAt(0)}</div>
+        <span style="font-weight:500">${m.name}</span>
+        <span class="modal-status ${blocked ? 'no' : 'ok'}">${blocked ? '불가' : '가능'}</span>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('dateModal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('dateModal').classList.remove('open'); }
+
+function renderRecommend() {
+  const sec = document.getElementById('recommendSection');
+  if (viewMode !== 'group') { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const scores = [];
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dk = dateKey(calYear, calMonth, d);
+    let freeCount = 0;
+    state.members.forEach(m => { if (!state.schedules[m.id]?.[dk]) freeCount++; });
+    scores.push({ d, dk, freeCount });
+  }
+  scores.sort((a,b) => b.freeCount - a.freeCount);
+  const top = scores.slice(0, 6).filter(s => s.freeCount > 0);
+  const chips = document.getElementById('recommendChips');
+  const days = ['일','월','화','수','목','금','토'];
+  chips.innerHTML = top.map((s, i) => {
+    const dow = new Date(calYear, calMonth, s.d).getDay();
+    return `
+      <div class="recommend-chip ${i === 0 ? 'top' : ''}" onclick="openModal('${s.dk}', ${s.d})">
+        <span class="chip-date">${calMonth+1}/${s.d} (${days[dow]})</span>
+        <span class="chip-tag">${s.freeCount}명 가능</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderMemberStatus() {
+  const el = document.getElementById('memberStatusList');
+  el.innerHTML = state.members.map(m => {
+    const sched = state.schedules[m.id] || {};
+    const monthKeys = Object.keys(sched).filter(k => k.startsWith(`${calYear}-${String(calMonth+1).padStart(2,'0')}`));
+    return `
+      <div class="member-item ${monthKeys.length > 0 ? 'submitted' : ''}">
+        <div class="member-dot" style="background:${m.color};width:28px;height:28px;">${m.name.charAt(0)}</div>
+        <span class="member-item-name">${m.name}</span>
+        <span class="status-badge ${monthKeys.length > 0 ? 'done' : 'pending'}">${monthKeys.length > 0 ? '완료' : '대기'}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderStats() {
+  const el = document.getElementById('statsContent');
+  const total = state.members.length;
+  if (total === 0) return;
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  let allFreeCount = 0;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dk = dateKey(calYear, calMonth, d);
+    const blocked = state.members.filter(m => state.schedules[m.id]?.[dk]).length;
+    if (blocked === 0) allFreeCount++;
+  }
+  el.innerHTML = `
+    <div class="stat-row"><span>전체 멤버</span><span class="stat-val">${total}명</span></div>
+    <div class="stat-row"><span>전원 가능 날짜</span><span class="stat-val">${allFreeCount}일</span></div>
+  `;
+}
+
+function renderSubmitBar() {
+  const bar = document.getElementById('submitBar');
+  if (!currentUser || currentUser.isAdmin || viewMode === 'group') { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  const monthBlocked = Object.keys(state.schedules[currentUser.id] || {}).filter(k => k.startsWith(`${calYear}-${String(calMonth+1).padStart(2,'0')}`)).length;
+  document.getElementById('submitInfo').innerHTML = `<strong>${monthBlocked}일</strong> 선택됨`;
+}
+
+function clearMySchedule() {
+  const prefix = `${calYear}-${String(calMonth+1).padStart(2,'0')}`;
+  Object.keys(state.schedules[currentUser.id] || {}).forEach(k => { if (k.startsWith(prefix)) delete state.schedules[currentUser.id][k]; });
+  saveState(); renderAll();
+}
+
+function submitSchedule() { saveState(); showToast('전송 완료!'); renderAll(); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function renderAll() {
+  renderCalendar(); renderMemberStatus(); renderStats(); renderSubmitBar(); renderRecommend(); renderAdminMemberList();
+}
+
+renderLoginGrid();
+</script>
+</body>
+</html>
