@@ -14,9 +14,6 @@
     --pink-400: #f759ab;
     --pink-500: #eb2f96;
     --pink-600: #c41d7f;
-    --rose-100: #ffe4e6;
-    --rose-200: #fecdd3;
-    --rose-300: #fda4af;
     --white:    #ffffff;
     --gray-50:  #fdf2f8;
     --gray-100: #f9e8f2;
@@ -55,7 +52,6 @@
 
   .container { max-width: 800px; margin: 0 auto; padding: 20px; }
 
-  /* Login & Admin Panel */
   .card {
     background: var(--white);
     border-radius: 24px;
@@ -75,7 +71,6 @@
   .btn-outline { background: transparent; border: 1.5px solid var(--pink-200); color: var(--pink-500); }
   .btn-outline:hover { background: var(--pink-50); }
 
-  /* Calendar Styles */
   .calendar-header {
     display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
   }
@@ -89,12 +84,19 @@
     font-weight: 500; cursor: pointer; position: relative; transition: 0.2s;
     border: 1px solid transparent; font-size: 0.9rem;
   }
-  .day:hover:not(.empty) { background: var(--pink-100); transform: scale(1.05); }
+  .day:hover:not(.empty):not(.disabled) { background: var(--pink-100); transform: scale(1.05); }
   .day.today { border-color: var(--pink-300); color: var(--pink-500); font-weight: 700; }
   .day.blocked { background: var(--pink-400); color: white; }
   .day.empty { cursor: default; background: transparent; }
+  
+  /* 비활성화(지난 날짜) 스타일 */
+  .day.disabled { 
+    cursor: not-allowed; 
+    opacity: 0.3; 
+    background: #eee; 
+    color: #999;
+  }
 
-  /* Stats & Lists */
   .status-list { list-style: none; padding: 0; }
   .status-item {
     display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--pink-50);
@@ -103,7 +105,6 @@
   .status-ok { background: #e6fffa; color: #38b2ac; }
   .status-no { background: #fff5f5; color: #e53e3e; }
 
-  /* Admin */
   .admin-only { display: none; }
   .is-admin .admin-only { display: block; }
   .is-admin .member-only { display: none; }
@@ -116,7 +117,6 @@
   }
   #toast.show { opacity: 1; bottom: 50px; }
 
-  /* Bottom Bar */
   .submit-bar {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: white; padding: 15px 20px 30px;
@@ -138,11 +138,7 @@
 <div class="container">
   <div id="view-login" class="card">
     <h2 style="margin-top:0">누구신가요?</h2>
-    <div id="login-buttons" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-      </div>
-    <p style="text-align:center; margin-top:20px; font-size:0.85rem; color:var(--gray-400)">
-      목록에 없다면 관리자에게 추가를 요청하세요.
-    </p>
+    <div id="login-buttons" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div>
   </div>
 
   <div id="view-app" style="display:none;">
@@ -153,11 +149,11 @@
 
     <div class="card member-only">
       <div class="calendar-header">
-        <h3 id="calendar-month" style="margin:0">2024년 5월</h3>
+        <h3 id="calendar-month" style="margin:0"></h3>
         <button class="btn btn-outline" onclick="clearMySchedule()" style="padding:6px 12px; font-size:0.8rem;">초기화</button>
       </div>
       <div class="calendar-grid" id="calendar-body"></div>
-      <p style="font-size:0.8rem; color:var(--gray-400); margin-top:15px;">* 불가능한 날짜를 모두 터치하세요.</p>
+      <p style="font-size:0.8rem; color:var(--gray-400); margin-top:15px;">* 오늘 이전 날짜는 선택할 수 없습니다.</p>
     </div>
 
     <div class="card">
@@ -192,7 +188,6 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  // 사용자가 제공한 Firebase 설정
   const firebaseConfig = {
     apiKey: "AIzaSyCi1reez3OB1OtW5uFTe8sLUWE7pZj8A_k",
     authDomain: "calender-share-62977.firebaseapp.com",
@@ -201,23 +196,24 @@
     messagingSenderId: "1009398929215",
     appId: "1:1009398929215:web:b664d6289d948b4509a58a",
     measurementId: "G-8N28BYYJ4K",
-    databaseURL: "https://calender-share-62977-default-rtdb.firebaseio.com" // 직접 추가함
+    databaseURL: "https://calender-share-62977-default-rtdb.firebaseio.com"
   };
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
   const dbRef = ref(db, 'scheduler_data');
 
-  // 전역 상태
+  // 현재 날짜 기준으로 년/월 자동 설정
+  const now = new Date();
+  window.calYear = now.getFullYear();
+  window.calMonth = now.getMonth(); 
+
   window.state = {
     members: [{ id: 'admin', name: '관리자 ✨', isAdmin: true }],
-    schedules: {} // { userId: { "2024-05-10": true } }
+    schedules: {}
   };
   window.currentUser = null;
-  window.calYear = 2024;
-  window.calMonth = 4; // 5월 (0부터 시작)
 
-  // 1. 서버에서 실시간 데이터 로드
   onValue(dbRef, (snapshot) => {
     const data = snapshot.val();
     if (data) {
@@ -228,14 +224,12 @@
     renderAll();
   });
 
-  // 2. 서버에 데이터 저장 함수
   window.syncWithServer = function() {
     set(dbRef, window.state);
   };
 </script>
 
 <script>
-// UI 로직
 function renderLogin() {
   const container = document.getElementById('login-buttons');
   container.innerHTML = '';
@@ -267,7 +261,10 @@ function logout() {
 
 function renderCalendar() {
   const body = document.getElementById('calendar-body');
+  const title = document.getElementById('calendar-month');
   body.innerHTML = '';
+  title.textContent = `${calYear}년 ${calMonth + 1}월`;
+
   const days = ['일','월','화','수','목','금','토'];
   days.forEach(d => {
     const el = document.createElement('div');
@@ -278,6 +275,8 @@ function renderCalendar() {
 
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const lastDate = new Date(calYear, calMonth + 1, 0).getDate();
+  const today = new Date();
+  today.setHours(0,0,0,0); // 비교를 위해 시간 초기화
 
   for(let i=0; i<firstDay; i++) {
     const el = document.createElement('div');
@@ -289,11 +288,21 @@ function renderCalendar() {
 
   for(let d=1; d<=lastDate; d++) {
     const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const thisDate = new Date(calYear, calMonth, d);
+    
     const el = document.createElement('div');
     el.className = 'day';
-    if (mySched[dateStr]) el.classList.add('blocked');
+    
+    // 지난 날짜 비활성화 로직
+    if (thisDate < today) {
+      el.classList.add('disabled');
+    } else {
+      if (mySched[dateStr]) el.classList.add('blocked');
+      if (thisDate.getTime() === today.getTime()) el.classList.add('today');
+      el.onclick = () => toggleDate(dateStr);
+    }
+    
     el.textContent = d;
-    el.onclick = () => toggleDate(dateStr);
     body.appendChild(el);
   }
 }
@@ -322,7 +331,7 @@ function renderSubmitBar() {
 }
 
 function submitSchedule() {
-  syncWithServer(); // 파이어베이스 전송
+  syncWithServer();
   showToast('서버로 일정이 전송되었습니다!');
 }
 
@@ -384,7 +393,13 @@ function renderRecommend() {
   if (members.length === 0) return;
 
   let candidates = [];
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
   for(let d=1; d<=lastDate; d++) {
+    const thisDate = new Date(calYear, calMonth, d);
+    if (thisDate < today) continue; // 추천에서도 지난 날짜 제외
+
     const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     let blockers = [];
     members.forEach(m => {
@@ -400,8 +415,9 @@ function renderRecommend() {
     const div = document.createElement('div');
     div.style.padding = '10px';
     div.style.marginBottom = '8px';
-    div.style.background = var(--gray-50);
+    div.style.background = '#fdf2f8';
     div.style.borderRadius = '10px';
+    div.style.fontSize = '0.9rem';
     div.innerHTML = `<strong>${c.date}일</strong>: ${c.count}명 가능 (불가: ${c.blockers.join(', ') || '없음'})`;
     list.appendChild(div);
   });
@@ -428,9 +444,6 @@ function showToast(msg) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
 }
-
-// 초기 실행
-renderLogin();
 </script>
 </body>
 </html>
