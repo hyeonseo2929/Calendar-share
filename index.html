@@ -3,30 +3,29 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Friend Scheduler - Firebase Edition</title>
+<title>Friend Scheduler - Admin Fix</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
-  /* [기존 스타일 유지] */
+  /* [기존 스타일 동일 유지] */
   :root {
-    --pink-50:  #fff0f6; --pink-100: #ffd6e7; --pink-200: #ffadd2; --pink-300: #ff85ba;
-    --pink-400: #f759ab; --pink-500: #eb2f96; --pink-600: #c41d7f; --rose-100: #ffe4e6;
-    --rose-200: #fecdd3; --rose-300: #fda4af; --white:    #ffffff; --gray-50:  #fdf2f8;
-    --gray-100: #f9e8f2; --gray-200: #f3d0e6; --gray-400: #c9879e; --gray-600: #9d5474;
-    --gray-800: #6b2d50; --shadow-sm: 0 2px 8px rgba(235,47,150,.10);
-    --shadow-md: 0 6px 24px rgba(235,47,150,.15); --shadow-lg: 0 16px 48px rgba(235,47,150,.18);
+    --pink-50:  #f8f7ff; --pink-100: #f3f0ff; --pink-200: #e5dbff; --pink-300: #d0bfff;
+    --pink-400: #b197fc; --pink-500: #9775fa; --pink-600: #845ef7; --rose-100: #f4f2ff;
+    --rose-200: #ede9fe; --rose-300: #ddd6fe; --white:    #ffffff; --gray-50:  #f8f9fa;
+    --gray-100: #f1f3f5; --gray-200: #e9ecef; --gray-400: #adb5bd; --gray-600: #868e96;
+    --gray-800: #495057; --shadow-sm: 0 2px 8px rgba(151,117,250,.10);
+    --shadow-md: 0 6px 24px rgba(151,117,250,.15); --shadow-lg: 0 16px 48px rgba(151,117,250,.18);
     --radius: 20px; --radius-sm: 12px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: linear-gradient(135deg, #fff0f6 0%, #fce7f3 40%, #fdf2f8 100%); min-height: 100vh; color: var(--gray-800); }
+  body { font-family: 'DM Sans', sans-serif; background: linear-gradient(135deg, #f8f7ff 0%, #f3f0ff 40%, #f1f3f5 100%); min-height: 100vh; color: var(--gray-800); }
   .header { background: rgba(255,255,255,.85); backdrop-filter: blur(18px); border-bottom: 1.5px solid var(--pink-100); padding: 0 32px; height: 68px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
   .header-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--pink-500); letter-spacing: -.5px; }
   .header-user { display: flex; align-items: center; gap: 10px; font-size: .88rem; font-weight: 500; color: var(--gray-600); }
-  .header-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .82rem; color: #fff; box-shadow: 0 2px 8px rgba(235,47,150,.3); flex-shrink: 0; }
+  .header-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .82rem; color: #fff; box-shadow: 0 2px 8px rgba(151,117,250,.3); flex-shrink: 0; }
   .screen { display: none; animation: fadeUp .4s ease; }
   .screen.active { display: block; }
   @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
   #loginScreen { min-height: 100vh; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 40px 20px; }
-  #loginScreen.active { display: flex; }
   .login-card { background: rgba(255,255,255,.92); border: 1.5px solid var(--pink-100); border-radius: 28px; padding: 44px 40px; width: 100%; max-width: 420px; box-shadow: var(--shadow-lg); }
   .login-title { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--pink-500); text-align: center; }
   .login-sub { font-size: .88rem; color: var(--gray-400); text-align: center; margin-bottom: 32px; }
@@ -35,7 +34,7 @@
   .member-login-btn:hover { border-color: var(--pink-300); background: var(--white); box-shadow: var(--shadow-sm); transform: translateY(-2px); }
   .member-dot { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.7rem; font-weight: 700; }
   .inp { width: 100%; padding: 11px 16px; border-radius: var(--radius-sm); border: 1.5px solid var(--pink-200); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: .88rem; color: var(--gray-800); outline: none; }
-  .btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 11px 22px; border-radius: 99px; border: none; background: linear-gradient(135deg, var(--pink-400), var(--pink-500)); color: #fff; font-weight: 600; cursor: pointer; box-shadow: 0 4px 14px rgba(235,47,150,.35); transition: .2s; }
+  .btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 11px 22px; border-radius: 99px; border: none; background: linear-gradient(135deg, var(--pink-400), var(--pink-500)); color: #fff; font-weight: 600; cursor: pointer; box-shadow: 0 4px 14px rgba(151,117,250,.35); transition: .2s; }
   .app-layout { max-width: 1300px; margin: 0 auto; padding: 32px 24px; display: grid; grid-template-columns: 320px 1fr; gap: 24px; align-items: start; }
   .card { background: rgba(255,255,255,.9); border: 1.5px solid var(--pink-100); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow-sm); }
   .admin-member-row { display: grid; grid-template-columns: 30px 1fr 50px 50px; gap: 8px; align-items: center; padding: 12px; border-radius: 12px; background: #fff; border: 1px solid var(--pink-100); margin-bottom: 8px; }
@@ -43,7 +42,7 @@
   .cal-grid-wrapper { background: rgba(255,255,255,.92); border: 1.5px solid var(--pink-100); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-md); }
   .cal-days { display: grid; grid-template-columns: repeat(7, 1fr); }
   .cal-day { min-height: 90px; padding: 8px; border-right: 1px solid var(--pink-100); border-bottom: 1px solid var(--pink-100); cursor: pointer; position: relative; display: flex; flex-direction: column; gap: 4px; }
-  .cal-day.blocked { background: linear-gradient(135deg, #ffe4e6, #fecdd3) !important; }
+  .cal-day.blocked { background: linear-gradient(135deg, #ede9fe, #ddd6fe) !important; }
   .day-dot { width: 10px; height: 10px; border-radius: 50%; }
   .toast { position: fixed; bottom: -50px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 12px 24px; border-radius: 99px; font-size: 0.9rem; transition: 0.3s; z-index: 1000; }
   .toast.show { bottom: 30px; }
@@ -53,7 +52,7 @@
 <body>
 
 <header class="header">
-  <div class="header-logo">Sched<span>pink</span></div>
+  <div class="header-logo">Sched<span>purple</span></div>
   <div class="header-user" id="headerUser" style="display:none">
     <div class="header-avatar" id="headerAvatar"></div>
     <span id="headerName"></span>
@@ -92,7 +91,7 @@
           <p style="font-size:0.75rem; font-weight:700; color:var(--pink-400); margin-bottom:8px;">신규 멤버 등록</p>
           <div style="display:flex; gap:8px;">
             <input class="inp" id="newMemberName" placeholder="이름" style="flex:2">
-            <input type="color" id="newMemberColor" value="#eb2f96" style="width:40px; height:40px; border:none; border-radius:8px; cursor:pointer;">
+            <input type="color" id="newMemberColor" value="#9775fa" style="width:40px; height:40px; border:none; border-radius:8px; cursor:pointer;">
             <button class="btn-primary" style="padding:0 15px;" onclick="addMember()">추가</button>
           </div>
         </div>
@@ -151,16 +150,30 @@
   const db = getDatabase(app);
   const dbRef = ref(db, 'scheduler_data');
 
+  // 초기 상태 정의
   window.state = { adminPw: 'admin1234', members: [], schedules: {} };
   window.currentUser = null;
   window.viewMode = 'personal';
   window.calYear = new Date().getFullYear();
   window.calMonth = new Date().getMonth();
 
-  // 데이터 실시간 감지
+  // 데이터 실시간 감지 및 초기화 로직
   onValue(dbRef, (snapshot) => {
     const data = snapshot.val();
-    if (data) window.state = data;
+    
+    // 데이터베이스가 비어있는 경우 (최초 접속 시)
+    if (!data) {
+      console.log("DB 초기화 중...");
+      window.state = { 
+        adminPw: 'admin1234', 
+        members: [], 
+        schedules: {} 
+      };
+      set(dbRef, window.state);
+    } else {
+      window.state = data;
+    }
+    
     renderLoginGrid();
     if (window.currentUser) renderAll();
   });
@@ -182,6 +195,10 @@
 
   function renderLoginGrid() {
     const grid = document.getElementById('memberLoginGrid');
+    if (!state.members || state.members.length === 0) {
+      grid.innerHTML = '<div style="color:var(--gray-400);font-size:.82rem;text-align:center;grid-column:span 2">멤버가 없습니다. 관리자가 추가해주세요.</div>';
+      return;
+    }
     grid.innerHTML = state.members.map(m => `
       <button class="member-login-btn" onclick="loginMember('${m.id}')">
         <div class="member-dot" style="background:${m.color}">${m.name.charAt(0)}</div>
@@ -195,10 +212,13 @@
   }
 
   function loginAdmin() {
-    if (document.getElementById('adminPwInput').value === state.adminPw) {
+    const input = document.getElementById('adminPwInput').value;
+    if (input === state.adminPw) {
       currentUser = { id: '_admin', name: '관리자', isAdmin: true };
       enterApp();
-    } else showToast('비번이 틀렸습니다');
+    } else {
+      showToast('비밀번호가 틀렸습니다');
+    }
   }
 
   function loginMember(id) {
@@ -239,19 +259,25 @@
       const el = document.createElement('div'); el.className = 'cal-day';
       el.innerHTML = `<div class="day-num">${d}</div>`;
       
-      const dots = document.createElement('div'); dots.style.display='flex'; dots.style.gap='2px';
-      state.members.forEach(m => {
-        if(state.schedules[m.id]?.[dk]) dots.innerHTML += `<div class="day-dot" style="background:${m.color}"></div>`;
-      });
+      const dots = document.createElement('div'); dots.style.display='flex'; dots.style.gap='2px'; dots.style.marginTop='auto';
+      if (state.members) {
+        state.members.forEach(m => {
+          if(state.schedules && state.schedules[m.id]?.[dk]) {
+            dots.innerHTML += `<div class="day-dot" style="background:${m.color}"></div>`;
+          }
+        });
+      }
       el.appendChild(dots);
 
-      if(viewMode === 'personal' && !currentUser.isAdmin && state.schedules[currentUser.id]?.[dk]) {
+      if(viewMode === 'personal' && !currentUser.isAdmin && state.schedules && state.schedules[currentUser.id]?.[dk]) {
         el.classList.add('blocked');
       }
 
       el.onclick = () => {
         if(currentUser.isAdmin || viewMode === 'group') return;
+        if(!state.schedules) state.schedules = {};
         if(!state.schedules[currentUser.id]) state.schedules[currentUser.id] = {};
+        
         if(state.schedules[currentUser.id][dk]) delete state.schedules[currentUser.id][dk];
         else state.schedules[currentUser.id][dk] = true;
         renderAll();
@@ -262,6 +288,7 @@
 
   function renderMemberStatus() {
     const el = document.getElementById('memberStatusList');
+    if (!state.members) return;
     el.innerHTML = state.members.map(m => `
       <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:0.85rem;">
         <div class="member-dot" style="background:${m.color}; width:20px; height:20px; font-size:0.6rem;">${m.name.charAt(0)}</div>
@@ -270,7 +297,7 @@
   }
 
   function renderStats() {
-    const total = state.members.length;
+    const total = state.members ? state.members.length : 0;
     document.getElementById('statsContent').innerHTML = `<div style="font-size:0.85rem;">총 멤버: <b>${total}명</b></div>`;
   }
 
@@ -278,7 +305,7 @@
     const bar = document.getElementById('submitBar');
     if(currentUser.isAdmin || viewMode === 'group') { bar.style.display = 'none'; return; }
     bar.style.display = 'flex';
-    const count = Object.keys(state.schedules[currentUser.id] || {}).length;
+    const count = (state.schedules && state.schedules[currentUser.id]) ? Object.keys(state.schedules[currentUser.id]).length : 0;
     document.getElementById('submitInfo').innerHTML = `현재 <b>${count}일</b> 선택됨`;
   }
 
@@ -296,17 +323,18 @@
     renderAll();
   }
 
-  // 관리자 기능
   function addMember() {
     const name = document.getElementById('newMemberName').value;
     const color = document.getElementById('newMemberColor').value;
     if(!name) return;
+    if(!state.members) state.members = [];
     state.members.push({ id: 'u'+Date.now(), name, color });
     sync();
   }
 
   function renderAdminList() {
     const el = document.getElementById('adminDetailedList');
+    if (!state.members) return;
     el.innerHTML = state.members.map(m => `
       <div class="admin-member-row">
         <div style="background:${m.color}; width:15px; height:15px; border-radius:50%;"></div>
@@ -317,13 +345,17 @@
 
   function removeMember(id) {
     state.members = state.members.filter(m => m.id !== id);
-    delete state.schedules[id];
+    if(state.schedules) delete state.schedules[id];
     sync();
   }
 
   function changeAdminPw() {
     const pw = document.getElementById('newPwInput').value;
-    if(pw) { state.adminPw = pw; sync(); }
+    if(pw) { 
+      state.adminPw = pw; 
+      sync(); 
+      showToast('비밀번호가 변경되었습니다');
+    }
   }
 </script>
 </body>
