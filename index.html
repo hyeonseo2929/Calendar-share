@@ -1,23 +1,414 @@
-/* Lavender Purple Tones */
-    --pink-50:  #f8f7ff; /* 아주 연한 라벤더 화이트 */
-    --pink-100: #f3f0ff; /* 연한 라벤더 틴트 */
-    --pink-200: #e5dbff; /* 화사한 연보라 */
-    --pink-300: #d0bfff; /* 부드러운 라벤더 */
-    --pink-400: #b197fc; /* 중간 톤 퍼플 */
-    --pink-500: #9775fa; /* 메인 포인트 퍼플 (기존 핑크500 대체) */
-    --pink-600: #845ef7; /* 깊은 퍼플 포인트 */
-    
-    /* Rose(Warm) -> Lavender(Cool) Tones */
-    --rose-100: #f4f2ff;
-    --rose-200: #ede9fe;
-    --rose-300: #ddd6fe;
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Friend Scheduler - Lavender Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    /* Lavender Purple Theme */
+    --lavender-50:  #f8f7ff; /* 아주 연한 라벤더 화이트 */
+    --lavender-100: #f3f0ff; /* 연한 라벤더 틴트 */
+    --lavender-200: #e5dbff; /* 화사한 연보라 */
+    --lavender-300: #d0bfff; /* 부드러운 라벤더 */
+    --lavender-400: #b197fc; /* 중간 톤 퍼플 */
+    --lavender-500: #9775fa; /* 메인 포인트 퍼플 */
+    --lavender-600: #845ef7; /* 깊은 퍼플 포인트 */
     
     --white:    #ffffff;
-    
-    /* Grays (약간의 보라색 기가 섞인 세련된 그레이) */
     --gray-50:  #f8f9fa;
     --gray-100: #f1f3f5;
     --gray-200: #e9ecef;
     --gray-400: #adb5bd;
     --gray-600: #868e96;
-    --gray-800: #495057; /* 텍스트 가독성을 위해 어두운 톤 유지 */
+    --gray-800: #495057;
+    
+    --shadow: 0 10px 30px rgba(151, 117, 250, 0.12);
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; padding: 0;
+    font-family: 'DM Sans', 'Noto Sans KR', sans-serif;
+    /* 배경 그라데이션을 시원한 라벤더 톤으로 수정 */
+    background: linear-gradient(135deg, var(--lavender-50) 0%, var(--white) 100%);
+    color: var(--gray-800);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--white);
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    border-bottom: 1px solid var(--lavender-100);
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    margin: 0;
+    color: var(--lavender-600);
+    letter-spacing: -1px;
+  }
+
+  .container { max-width: 800px; margin: 0 auto; padding: 20px; padding-bottom: 120px; }
+
+  /* Card UI */
+  .card {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--lavender-100);
+  }
+
+  /* Buttons */
+  .btn {
+    border: none; border-radius: 12px; padding: 12px 20px;
+    font-weight: 600; cursor: pointer; transition: 0.3s;
+    font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary { background: var(--lavender-500); color: white; width: 100%; }
+  .btn-primary:hover { background: var(--lavender-600); transform: translateY(-2px); }
+  .btn-outline { background: transparent; border: 1.5px solid var(--lavender-200); color: var(--lavender-600); }
+  .btn-outline:hover { background: var(--lavender-50); }
+
+  /* Calendar Grid */
+  .calendar-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+  }
+  .calendar-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;
+  }
+  .day-label { text-align: center; font-weight: 600; font-size: 0.8rem; color: var(--gray-400); padding-bottom: 10px; }
+  .day {
+    aspect-ratio: 1; border-radius: 14px; background: var(--gray-50);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-weight: 500; cursor: pointer; position: relative; transition: 0.2s;
+    border: 1px solid transparent; font-size: 0.9rem; overflow: hidden;
+  }
+  .day:hover:not(.empty):not(.disabled) { background: var(--lavender-100); transform: scale(1.05); }
+  .day.today { border-color: var(--lavender-300); color: var(--lavender-600); font-weight: 700; }
+  .day.empty { cursor: default; background: transparent; }
+  .day.disabled { cursor: not-allowed; opacity: 0.3; background: var(--gray-100); color: var(--gray-400); }
+
+  /* Dots for members */
+  .dot-container { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; margin-top: 2px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* Stats & Legend */
+  .status-item {
+    display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--lavender-50);
+  }
+  .color-badge { width: 14px; height: 14px; border-radius: 4px; display: inline-block; margin-right: 6px; }
+
+  /* Toast & Submit Bar */
+  #toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    background: var(--lavender-600); color: white; padding: 12px 24px;
+    border-radius: 30px; font-size: 0.9rem; z-index: 1000;
+    opacity: 0; transition: 0.3s; pointer-events: none;
+  }
+  #toast.show { opacity: 1; bottom: 50px; }
+
+  .submit-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: white; padding: 15px 20px 30px;
+    box-shadow: 0 -10px 30px rgba(151, 117, 250, 0.08);
+    display: flex; flex-direction: column; gap: 10px;
+    border-top: 1px solid var(--lavender-100);
+    z-index: 900; transform: translateY(100%); transition: 0.4s;
+  }
+  .submit-bar.active { transform: translateY(0); }
+
+  /* Admin Section */
+  .admin-only { display: none; }
+  .is-admin .admin-only { display: block; }
+  .is-admin .member-only { display: none; }
+  .admin-input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  input, select { 
+    padding: 12px; border-radius: 12px; border: 1px solid var(--lavender-200); 
+    font-family: inherit; font-size: 0.95rem; outline: none;
+  }
+  input:focus { border-color: var(--lavender-500); box-shadow: 0 0 0 3px rgba(151, 117, 250, 0.1); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Friend Scheduler</h1>
+  <p style="color: var(--gray-400); font-size: 0.9rem; margin-top: 5px;">모두가 만날 수 있는 그날까지</p>
+</header>
+
+<div class="container">
+  <div id="view-login" class="card">
+    <h2 style="margin-top:0; font-size: 1.3rem;">멤버 선택</h2>
+    <div id="login-buttons" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"></div>
+  </div>
+
+  <div id="view-app" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <strong id="user-display" style="color: var(--lavender-600);"></strong>
+      <button class="btn btn-outline" onclick="logout()" style="padding:6px 12px; font-size:0.8rem; border-radius:8px;">로그아웃</button>
+    </div>
+
+    <div class="card member-only">
+      <div class="calendar-header">
+        <h3 id="cal-title" style="margin:0; font-size: 1.1rem; color: var(--lavender-600);"></h3>
+        <button class="btn btn-outline" onclick="clearMySchedule()" style="padding:6px 12px; font-size:0.8rem;">초기화</button>
+      </div>
+      <div class="calendar-grid" id="calendar-body"></div>
+      <p style="font-size:0.8rem; color:var(--gray-400); margin-top:15px;">* 불가능한 날짜를 선택하세요.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0; font-size: 1.1rem;">전체 현황</h3>
+      <div id="member-legend" style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:15px; font-size:0.85rem;"></div>
+      <div id="member-status-list"></div>
+    </div>
+
+    <div class="card" style="background: var(--lavender-50); border: none;">
+      <h3 style="margin-top:0; font-size: 1.1rem;">추천 만남일 🥂</h3>
+      <div id="recommend-box"></div>
+    </div>
+
+    <div id="admin-panel" class="card admin-only">
+      <h3 style="margin-top:0; font-size: 1.1rem;">멤버 관리 (Admin)</h3>
+      <div class="admin-input-group">
+        <input type="text" id="new-name" placeholder="친구 이름">
+        <select id="new-color">
+          <option value="#9775fa">기본 라벤더</option>
+          <option value="#845ef7">딥 퍼플</option>
+          <option value="#5c7cfa">로열 블루</option>
+          <option value="#20c997">에메랄드</option>
+          <option value="#fcc419">머스타드</option>
+          <option value="#ff6b6b">소프트 레드</option>
+          <option value="#ffa94d">오렌지</option>
+        </select>
+        <button class="btn btn-primary" onclick="addMember()">친구 추가하기</button>
+      </div>
+      <ul id="admin-member-list" style="list-style:none; padding:0; margin:0;"></ul>
+    </div>
+  </div>
+</div>
+
+<div id="submit-bar" class="submit-bar">
+  <div id="submit-info" style="font-size:0.9rem; text-align:center; color: var(--gray-600);"></div>
+  <button class="btn btn-primary" onclick="submitSchedule()">일정 전송하기</button>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCi1reez3OB1OtW5uFTe8sLUWE7pZj8A_k",
+    authDomain: "calender-share-62977.firebaseapp.com",
+    projectId: "calender-share-62977",
+    storageBucket: "calender-share-62977.firebasestorage.app",
+    messagingSenderId: "1009398929215",
+    appId: "1:1009398929215:web:b664d6289d948b4509a58a",
+    measurementId: "G-8N28BYYJ4K",
+    databaseURL: "https://calender-share-62977-default-rtdb.firebaseio.com"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const dbRef = ref(db, 'scheduler_v2_lavender');
+
+  const now = new Date();
+  window.calYear = now.getFullYear();
+  window.calMonth = now.getMonth();
+  window.state = { 
+    members: [{id:'admin', name:'관리자 ✨', color:'#495057', isAdmin:true}], 
+    schedules: {} 
+  };
+  window.currentUser = null;
+
+  onValue(dbRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) window.state = data;
+    renderLogin();
+    renderAll();
+  });
+
+  window.sync = () => set(dbRef, window.state);
+</script>
+
+<script>
+// --- UI & Logic (Lavender Version) ---
+function renderLogin() {
+  const div = document.getElementById('login-buttons');
+  div.innerHTML = '';
+  state.members.forEach(m => {
+    const b = document.createElement('button');
+    b.className = 'btn btn-outline';
+    b.innerHTML = `<span class="color-badge" style="background:${m.color}"></span>${m.name}`;
+    b.onclick = () => login(m.id);
+    div.appendChild(b);
+  });
+}
+
+function login(uid) {
+  currentUser = state.members.find(m => m.id === uid);
+  document.getElementById('view-login').style.display = 'none';
+  document.getElementById('view-app').style.display = 'block';
+  document.getElementById('user-display').textContent = `${currentUser.name}님 환영해요 💜`;
+  document.getElementById('admin-panel').style.display = currentUser.isAdmin ? 'block' : 'none';
+  renderAll();
+}
+
+function logout() { location.reload(); }
+
+function renderCalendar() {
+  const body = document.getElementById('calendar-body');
+  const title = document.getElementById('cal-title');
+  body.innerHTML = '';
+  title.textContent = `${calYear}년 ${calMonth+1}월`;
+
+  ['일','월','화','수','목','금','토'].forEach(d => {
+    const el = document.createElement('div'); el.className='day-label'; el.textContent=d; body.appendChild(el);
+  });
+
+  const first = new Date(calYear, calMonth, 1).getDay();
+  const last = new Date(calYear, calMonth + 1, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  for(let i=0; i<first; i++) body.appendChild(Object.assign(document.createElement('div'), {className:'day empty'}));
+
+  for(let d=1; d<=last; d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const thisDate = new Date(calYear, calMonth, d);
+    const el = document.createElement('div'); el.className = 'day';
+    if(thisDate.getTime() === today.getTime()) el.classList.add('today');
+
+    el.innerHTML = `<span>${d}</span>`;
+
+    const dotBox = document.createElement('div'); dotBox.className = 'dot-container';
+    state.members.filter(m => !m.isAdmin).forEach(m => {
+      if(state.schedules[m.id] && state.schedules[m.id][dateStr]) {
+        const dot = document.createElement('div');
+        dot.className = 'dot'; dot.style.background = m.color;
+        dotBox.appendChild(dot);
+      }
+    });
+    el.appendChild(dotBox);
+
+    if (thisDate < today) {
+      el.classList.add('disabled');
+    } else if (!currentUser.isAdmin) {
+      const isBlocked = state.schedules[currentUser.id]?.[dateStr];
+      if (isBlocked) el.style.boxShadow = `inset 0 0 0 2px ${currentUser.color}`;
+      el.onclick = () => {
+        if(!state.schedules[currentUser.id]) state.schedules[currentUser.id] = {};
+        const sched = state.schedules[currentUser.id];
+        if(sched[dateStr]) delete sched[dateStr]; else sched[dateStr] = true;
+        renderSubmitBar();
+        renderAll();
+      };
+    }
+    body.appendChild(el);
+  }
+}
+
+function renderSubmitBar() {
+  const bar = document.getElementById('submit-bar');
+  if (currentUser && !currentUser.isAdmin) {
+    bar.classList.add('active');
+    const userSched = state.schedules[currentUser.id] || {};
+    const count = Object.keys(userSched).length;
+    document.getElementById('submit-info').innerHTML = `현재 <strong>${count}일</strong> 선택됨`;
+  }
+}
+
+function renderAll() {
+  renderCalendar();
+  renderLegend();
+  renderAdminList();
+  renderRecommend();
+}
+
+function renderLegend() {
+  const div = document.getElementById('member-legend');
+  div.innerHTML = '';
+  state.members.filter(m => !m.isAdmin).forEach(m => {
+    div.innerHTML += `<span><span class="color-badge" style="background:${m.color}"></span>${m.name}</span>`;
+  });
+}
+
+function renderAdminList() {
+  const list = document.getElementById('admin-member-list');
+  list.innerHTML = '';
+  state.members.filter(m => !m.isAdmin).forEach(m => {
+    const li = document.createElement('li');
+    li.className = 'status-item';
+    li.innerHTML = `<span><span class="color-badge" style="background:${m.color}"></span>${m.name}</span>
+                    <button class="btn btn-outline" onclick="removeMember('${m.id}')" style="padding:4px 8px; color:red; border-color:#ffcfcf;">삭제</button>`;
+    list.appendChild(li);
+  });
+}
+
+function addMember() {
+  const name = document.getElementById('new-name').value;
+  const color = document.getElementById('new-color').value;
+  if(!name) return;
+  state.members.push({id: 'u'+Date.now(), name, color, isAdmin:false});
+  document.getElementById('new-name').value = '';
+  sync();
+}
+
+function removeMember(uid) {
+  if(!confirm('정말 삭제할까요?')) return;
+  state.members = state.members.filter(m => m.id !== uid);
+  delete state.schedules[uid];
+  sync();
+}
+
+function submitSchedule() {
+  sync();
+  document.getElementById('submit-bar').classList.remove('active');
+  showToast('서버에 안전하게 저장되었습니다!');
+}
+
+function showToast(m) {
+  const t = document.getElementById('toast'); t.textContent=m; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function renderRecommend() {
+  const box = document.getElementById('recommend-box');
+  const members = state.members.filter(m => !m.isAdmin);
+  if(members.length === 0) { box.textContent = "관리자 탭에서 친구를 추가해 주세요!"; return; }
+  
+  const last = new Date(calYear, calMonth + 1, 0).getDate();
+  let bestDays = [];
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  for(let d=1; d<=last; d++) {
+    const thisDate = new Date(calYear, calMonth, d);
+    if(thisDate < today) continue;
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    let count = 0;
+    members.forEach(m => { if(!state.schedules[m.id]?.[dateStr]) count++; });
+    if(count > 0) bestDays.push({d, count});
+  }
+
+  bestDays.sort((a,b) => b.count - a.count);
+  const top = bestDays.slice(0, 3);
+  box.innerHTML = (top.length ? top.map(x => `<div><strong>${x.d}일</strong>: ${x.count}명 가능</div>`).join('') : "모두 가능한 날이 없어요 ㅠㅠ");
+}
+
+function clearMySchedule() {
+  if (!currentUser || currentUser.isAdmin) return;
+  state.schedules[currentUser.id] = {};
+  renderAll();
+  renderSubmitBar();
+}
+</script>
+</body>
+</html>
